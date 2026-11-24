@@ -1,0 +1,526 @@
+<div class="h-[calc(100vh-80px)] flex flex-col md:flex-row bg-slate-50 overflow-hidden font-sans">
+
+  <!-- ========================================================= -->
+  <!-- LEFT SIDEBAR: SESSIONS & PAST CONVERSATIONS               -->
+  <!-- ========================================================= -->
+  <aside
+    class="fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out md:static md:translate-x-0 flex flex-col h-full shadow-lg md:shadow-none"
+    [class.-translate-x-full]="!isSidebarOpen()"
+    [class.translate-x-0]="isSidebarOpen()"
+  >
+    <!-- Sidebar Header -->
+    <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-sm">
+          AI
+        </div>
+        <div>
+          <h2 class="text-sm font-extrabold text-[#172F61]">Chat Bot</h2>
+          <span class="text-[10px] font-semibold text-emerald-600 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Online & Ready
+          </span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        (click)="isSidebarOpen.set(false)"
+        class="md:hidden p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- New Chat Button -->
+    <div class="p-3">
+      <button
+        type="button"
+        (click)="startNewChat()"
+        class="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#315FEA] hover:bg-blue-700 shadow-sm shadow-blue-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        New Question Session
+      </button>
+    </div>
+
+    <!-- Recent Sessions List -->
+    <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
+      <div class="px-2 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+        <span>Recent History</span>
+        @if (conversations().length > 0) {
+          <button (click)="clearAllHistory()" class="text-[10px] text-rose-500 hover:underline lowercase font-semibold">
+            clear all
+          </button>
+        }
+      </div>
+
+      @for (conv of conversations(); track conv._id) {
+        <div
+          (click)="selectConversation(conv)"
+          class="p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between group"
+          [class.bg-blue-50]="activeConversationId() === conv._id"
+          [class.border-blue-200]="activeConversationId() === conv._id"
+          [class.text-blue-900]="activeConversationId() === conv._id"
+          [class.bg-white]="activeConversationId() !== conv._id"
+          [class.border-transparent]="activeConversationId() !== conv._id"
+          [class.hover:bg-slate-100]="activeConversationId() !== conv._id"
+        >
+          <div class="flex-1 min-w-0 pr-2">
+            <p class="text-xs font-bold truncate text-slate-800">
+              {{ conv.title || 'Conversation' }}
+            </p>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-semibold uppercase">
+                {{ conv.subject || 'Doubt' }}
+              </span>
+              <span class="text-[10px] text-slate-400">
+                {{ conv.updatedAt | date:'shortDate' }}
+              </span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            (click)="deleteConversation(conv._id, $event)"
+            class="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-600 transition-opacity"
+            title="Delete session"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      }
+
+      @if (conversations().length === 0) {
+        <div class="py-10 text-center px-4">
+          <p class="text-xs text-slate-400">No saved sessions yet. Start asking doubts to save your preparation history!</p>
+        </div>
+      }
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="p-3 bg-slate-50 border-t border-slate-100 text-[11px] text-slate-500 text-center">
+      ExamSphere RAG Architecture &bull; 24/7 AI Tutor
+    </div>
+  </aside>
+
+  <!-- Backdrop for Mobile Sidebar -->
+  @if (isSidebarOpen()) {
+    <div
+      (click)="isSidebarOpen.set(false)"
+      class="fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-xs md:hidden"
+    ></div>
+  }
+
+  <!-- ========================================================= -->
+  <!-- MAIN CHAT INTERACTION VIEWPORT                            -->
+  <!-- ========================================================= -->
+  <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 relative">
+
+    <!-- Top Settings Bar -->
+    <header class="bg-white border-b border-slate-200 px-4 py-3 shrink-0 flex flex-wrap items-center  justify-between gap-3 shadow-xs">
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          (click)="isSidebarOpen.set(true)"
+          class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-xl"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+        
+
+      
+    </header>
+
+    <!-- Horizontal Feature Mode Pills Strip -->
+    <!-- <div class="bg-white border-b border-slate-200 px-4 py-2 shrink-0 overflow-x-auto flex items-center gap-2 scrollbar-none">
+      @for (m of modes; track m.id) {
+        <button
+          type="button"
+          (click)="setMode(m.id)"
+          class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer border"
+          [class.bg-[#172F61]]="activeMode() === m.id"
+          [class.text-white]="activeMode() === m.id"
+          [class.border-[#172F61]]="activeMode() === m.id"
+          [class.shadow-xs]="activeMode() === m.id"
+          [class.bg-slate-50]="activeMode() !== m.id"
+          [class.text-slate-700]="activeMode() !== m.id"
+          [class.border-slate-200]="activeMode() !== m.id"
+          [class.hover:bg-slate-100]="activeMode() !== m.id"
+        >
+          <span>{{ m.icon }}</span>
+          <span>{{ m.label }}</span>
+        </button>
+      }
+    </div> -->
+
+    <!-- Active Document Badge (If uploaded) -->
+    @if (selectedDocument()) {
+      <div class="bg-blue-50 border-b border-blue-200 px-4 py-1.5 flex items-center justify-between text-xs text-blue-900 shrink-0">
+        <div class="flex items-center gap-2 truncate">
+          <span class="text-sm">📎</span>
+          <span class="font-bold">Active Note:</span>
+          <span class="truncate">{{ selectedDocument()?.name }}</span>
+          <span class="text-[10px] text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">
+            {{ selectedDocument()?.wordCount }} words indexed
+          </span>
+        </div>
+        <button
+          type="button"
+          (click)="removeDocument()"
+          class="text-blue-700 hover:text-rose-600 font-bold ml-2 shrink-0 cursor-pointer"
+        >
+          ✕ Detach
+        </button>
+      </div>
+    }
+
+    <!-- Messages Container -->
+    <div #chatScrollContainer class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+
+      @for (msg of messages(); track msg.id) {
+        @if (msg.role === 'user') {
+          <!-- User Bubble -->
+          <div class="flex justify-end">
+            <div class="max-w-[85%] sm:max-w-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-3xl rounded-tr-xs p-4 sm:p-5 shadow-sm shadow-blue-500/10">
+              <p class="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">{{ msg.content }}</p>
+              <div class="text-[10px] text-blue-200 text-right mt-1.5 font-medium">
+                {{ msg.createdAt | date:'shortTime' }}
+              </div>
+            </div>
+          </div>
+        } @else {
+          <!-- AI Mentor Bubble -->
+          <div class="flex items-start gap-3 max-w-[95%] sm:max-w-3xl">
+            <!-- Avatar -->
+            <div class="w-9 h-9 rounded-xl bg-[#172F61] text-white font-bold flex items-center justify-center shrink-0 shadow-sm mt-1 text-xs">
+              AI
+            </div>
+
+            <!-- Content Container -->
+            <div class="bg-white border border-slate-200 rounded-3xl rounded-tl-xs p-5 sm:p-6 shadow-xs flex-1 space-y-4">
+              <!-- Top Bubble Meta -->
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-extrabold text-[#172F61]">ExamSphere AI Mentor</span>
+                  @if (msg.mode) {
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100 capitalize">
+                      {{ msg.mode.replace('_', ' ') }}
+                    </span>
+                  }
+                </div>
+
+                <!-- Text-to-Speech Listen Button -->
+                <button
+                  type="button"
+                  (click)="speakMessage(msg.id, msg.content)"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                  [class.bg-emerald-100]="isVoiceSpeaking() && activeSpeakingMessageId() === msg.id"
+                  [class.text-emerald-800]="isVoiceSpeaking() && activeSpeakingMessageId() === msg.id"
+                  [class.bg-slate-100]="!isVoiceSpeaking() || activeSpeakingMessageId() !== msg.id"
+                  [class.text-slate-600]="!isVoiceSpeaking() || activeSpeakingMessageId() !== msg.id"
+                  [class.hover:bg-blue-100]="!isVoiceSpeaking() || activeSpeakingMessageId() !== msg.id"
+                  [class.hover:text-blue-800]="!isVoiceSpeaking() || activeSpeakingMessageId() !== msg.id"
+                  title="Listen to this explanation aloud"
+                >
+                  @if (isVoiceSpeaking() && activeSpeakingMessageId() === msg.id) {
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>Stop Audio</span>
+                  } @else {
+                    <span>🔊</span>
+                    <span>Listen</span>
+                  }
+                </button>
+              </div>
+
+              <!-- Main Markdown Content -->
+              <div
+                class="text-sm sm:text-base text-slate-800 leading-relaxed space-y-2 prose max-w-none"
+                [innerHTML]="formatMarkdown(msg.content)"
+              ></div>
+
+              <!-- ============================================= -->
+              <!-- INTERACTIVE PRACTICE MCQS CARD                -->
+              <!-- ============================================= -->
+              @if (msg.mcqs && msg.mcqs.length > 0) {
+                <div class="pt-4 border-t border-slate-100 space-y-4">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
+                      <span>🎯</span> Interactive Practice Drill ({{ msg.mcqs.length }} Questions)
+                    </span>
+                    <span class="text-[11px] text-slate-400">Click an option to test your answer</span>
+                  </div>
+
+                  @for (mcq of msg.mcqs; track mcq.question; let qIdx = $index) {
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3">
+                      <p class="text-xs sm:text-sm font-bold text-slate-900">
+                        <span class="text-blue-600 mr-1">Q{{ qIdx + 1 }}.</span> {{ mcq.question }}
+                      </p>
+
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        @for (opt of mcq.options; track opt; let optIdx = $index) {
+                          <button
+                            type="button"
+                            (click)="selectMCQOption(msg.id + '-' + qIdx, optIdx)"
+                            class="p-2.5 rounded-xl text-xs font-semibold text-left transition-all border flex items-center gap-2 cursor-pointer"
+                            [class.bg-emerald-50]="isMCQOptionSelected(msg.id + '-' + qIdx, optIdx) && optIdx === mcq.correctIndex"
+                            [class.border-emerald-500]="isMCQOptionSelected(msg.id + '-' + qIdx, optIdx) && optIdx === mcq.correctIndex"
+                            [class.text-emerald-900]="isMCQOptionSelected(msg.id + '-' + qIdx, optIdx) && optIdx === mcq.correctIndex"
+                            [class.bg-rose-50]="isMCQOptionSelected(msg.id + '-' + qIdx, optIdx) && optIdx !== mcq.correctIndex"
+                            [class.border-rose-400]="isMCQOptionSelected(msg.id + '-' + qIdx, optIdx) && optIdx !== mcq.correctIndex"
+                            [class.text-rose-900]="isMCQOptionSelected(msg.id + '-' + qIdx, optIdx) && optIdx !== mcq.correctIndex"
+                            [class.bg-white]="!isMCQOptionSelected(msg.id + '-' + qIdx, optIdx)"
+                            [class.border-slate-200]="!isMCQOptionSelected(msg.id + '-' + qIdx, optIdx)"
+                            [class.text-slate-700]="!isMCQOptionSelected(msg.id + '-' + qIdx, optIdx)"
+                            [class.hover:border-blue-300]="!isMCQOptionSelected(msg.id + '-' + qIdx, optIdx)"
+                          >
+                            <span
+                              class="w-5 h-5 rounded-md flex items-center justify-center font-bold text-[10px] shrink-0"
+                              [class.bg-emerald-600]="isMCQOptionSelected(msg.id + '-' + qIdx, optIdx) && optIdx === mcq.correctIndex"
+                              [class.text-white]="isMCQOptionSelected(msg.id + '-' + qIdx, optIdx) && optIdx === mcq.correctIndex"
+                              [class.bg-rose-600]="isMCQOptionSelected(msg.id + '-' + qIdx, optIdx) && optIdx !== mcq.correctIndex"
+                              [class.text-white]="isMCQOptionSelected(msg.id + '-' + qIdx, optIdx) && optIdx !== mcq.correctIndex"
+                              [class.bg-slate-100]="!isMCQOptionSelected(msg.id + '-' + qIdx, optIdx)"
+                              [class.text-slate-600]="!isMCQOptionSelected(msg.id + '-' + qIdx, optIdx)"
+                            >
+                              {{ ['A','B','C','D'][optIdx] }}
+                            </span>
+                            <span class="flex-1">{{ opt }}</span>
+                          </button>
+                        }
+                      </div>
+
+                      <!-- Explanation Drawer -->
+                      @if (mcqUserAnswers()[msg.id + '-' + qIdx] !== undefined) {
+                        <div
+                          class="p-3 rounded-xl text-xs mt-2"
+                          [class.bg-emerald-50]="mcqUserAnswers()[msg.id + '-' + qIdx] === mcq.correctIndex"
+                          [class.border]="mcqUserAnswers()[msg.id + '-' + qIdx] === mcq.correctIndex"
+                          [class.border-emerald-200]="mcqUserAnswers()[msg.id + '-' + qIdx] === mcq.correctIndex"
+                          [class.text-emerald-950]="mcqUserAnswers()[msg.id + '-' + qIdx] === mcq.correctIndex"
+                          [class.bg-amber-50]="mcqUserAnswers()[msg.id + '-' + qIdx] !== mcq.correctIndex"
+                          [class.border-amber-200]="mcqUserAnswers()[msg.id + '-' + qIdx] !== mcq.correctIndex"
+                          [class.text-amber-950]="mcqUserAnswers()[msg.id + '-' + qIdx] !== mcq.correctIndex"
+                        >
+                          <strong class="font-bold block mb-1">
+                            {{ mcqUserAnswers()[msg.id + '-' + qIdx] === mcq.correctIndex ? '✅ Correct Answer!' : '❌ Incorrect — Correct Option is ' + ['A','B','C','D'][mcq.correctIndex] }}:
+                          </strong>
+                          <p class="leading-relaxed">{{ mcq.explanation }}</p>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- ============================================= -->
+              <!-- INTERACTIVE FLASHCARDS CARD                   -->
+              <!-- ============================================= -->
+              @if (msg.flashcards && msg.flashcards.length > 0) {
+                <div class="pt-4 border-t border-slate-100 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-600 flex items-center gap-1.5">
+                      <span>⚡</span> Active-Recall Flashcards ({{ msg.flashcards.length }})
+                    </span>
+                    <span class="text-[11px] text-slate-400">Click card to flip</span>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    @for (card of msg.flashcards; track card.front; let fIdx = $index) {
+                      <div
+                        (click)="toggleFlashcard(msg.id + '-' + fIdx)"
+                        class="p-4 rounded-2xl border transition-all cursor-pointer min-h-[110px] flex flex-col justify-between shadow-xs select-none"
+                        [class.bg-gradient-to-br]="true"
+                        [class.from-amber-50]="!isFlashcardFlipped(msg.id + '-' + fIdx)"
+                        [class.to-orange-50]="!isFlashcardFlipped(msg.id + '-' + fIdx)"
+                        [class.border-amber-200]="!isFlashcardFlipped(msg.id + '-' + fIdx)"
+                        [class.from-blue-50]="isFlashcardFlipped(msg.id + '-' + fIdx)"
+                        [class.to-indigo-50]="isFlashcardFlipped(msg.id + '-' + fIdx)"
+                        [class.border-blue-200]="isFlashcardFlipped(msg.id + '-' + fIdx)"
+                      >
+                        <div>
+                          <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider mb-2">
+                            <span [class.text-amber-800]="!isFlashcardFlipped(msg.id + '-' + fIdx)" [class.text-blue-800]="isFlashcardFlipped(msg.id + '-' + fIdx)">
+                              {{ isFlashcardFlipped(msg.id + '-' + fIdx) ? 'Insight / Answer' : 'Question / Concept' }}
+                            </span>
+                            <span class="text-slate-400">Card {{ fIdx + 1 }}</span>
+                          </div>
+                          <p class="text-xs sm:text-sm font-semibold" [class.text-slate-900]="!isFlashcardFlipped(msg.id + '-' + fIdx)" [class.text-blue-950]="isFlashcardFlipped(msg.id + '-' + fIdx)">
+                            {{ isFlashcardFlipped(msg.id + '-' + fIdx) ? card.back : card.front }}
+                          </p>
+                        </div>
+                        <span class="text-[10px] text-slate-400 mt-2 block text-right font-medium">
+                          {{ isFlashcardFlipped(msg.id + '-' + fIdx) ? '↺ Flip back' : '↷ Click to reveal' }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Official Citations / Sources -->
+              @if (msg.citations && msg.citations.length > 0) {
+                <div class="pt-2 flex items-center gap-2 text-xs text-slate-500">
+                  <span class="font-bold">Verified Sources:</span>
+                  @for (c of msg.citations; track c) {
+                    <span class="px-2 py-0.5 rounded bg-slate-100 text-blue-600 font-medium truncate max-w-xs">
+                      {{ c }}
+                    </span>
+                  }
+                </div>
+              }
+
+              <!-- Suggested Follow-up Prompts -->
+              @if (msg.suggestedPrompts && msg.suggestedPrompts.length > 0) {
+                <div class="pt-3 border-t border-slate-100">
+                  <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Explore Deeper:</p>
+                  <div class="flex flex-wrap gap-1.5">
+                    @for (prompt of msg.suggestedPrompts; track prompt) {
+                      <button
+                        type="button"
+                        (click)="selectPrompt(prompt)"
+                        class="text-left text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer"
+                      >
+                        {{ prompt }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+
+      <!-- Loading / Thinking Indicator -->
+      @if (isLoading()) {
+        <div class="flex items-start gap-3">
+          <div class="w-9 h-9 rounded-xl bg-[#172F61] text-white font-bold flex items-center justify-center shrink-0 shadow-sm mt-1 text-xs">
+            AI
+          </div>
+          <div class="bg-white border border-slate-200 rounded-3xl rounded-tl-xs p-4 shadow-xs flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-blue-600 animate-bounce"></div>
+            <div class="w-2 h-2 rounded-full bg-indigo-600 animate-bounce" style="animation-delay: 0.2s"></div>
+            <div class="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style="animation-delay: 0.4s"></div>
+            <span class="text-xs font-semibold text-slate-500 ml-2">ExamSphere AI is analyzing and synthesizing guidance...</span>
+          </div>
+        </div>
+      }
+
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- BOTTOM INPUT CONSOLE                                      -->
+    <!-- ========================================================= -->
+    <footer class="bg-white border-t border-slate-200 p-3 sm:p-4 shrink-0 shadow-md">
+      <div class="max-w-4xl mx-auto space-y-2">
+
+        <!-- Hidden File Input for PDF / Notes upload -->
+        <input
+          #fileInputRef
+          type="file"
+          accept=".txt,.md,.pdf,.json"
+          (change)="onFileSelected($event)"
+          class="hidden"
+        />
+
+        <!-- Input Bar with Controls -->
+        <div class="relative flex items-center bg-slate-50 border border-slate-300 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-500/20 rounded-2xl p-1.5 transition-all">
+
+          <div class="pl-2 pr-1 text-blue-600 shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          <!-- Attach Note / Document Button -->
+          <button
+            type="button"
+            (click)="triggerFileInput()"
+            class="p-2 text-slate-500 hover:text-blue-600 hover:bg-white rounded-xl transition-all cursor-pointer shrink-0"
+            title="Attach Note or PDF document for RAG Q&A"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+            </svg>
+          </button>
+
+          <!-- Speech-to-Text Microphone Button -->
+          <button
+            type="button"
+            (click)="toggleVoiceInput()"
+            class="p-2 rounded-xl transition-all cursor-pointer shrink-0 mr-1"
+            [class.bg-rose-100]="isVoiceRecording()"
+            [class.text-rose-600]="isVoiceRecording()"
+            [class.animate-pulse]="isVoiceRecording()"
+            [class.text-slate-500]="!isVoiceRecording()"
+            [class.hover:text-blue-600]="!isVoiceRecording()"
+            [class.hover:bg-white]="!isVoiceRecording()"
+            title="Speak your question using microphone"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+          </button>
+
+          <!-- Input Textarea -->
+          <textarea
+            [ngModel]="currentInput()"
+            (ngModelChange)="currentInput.set($event)"
+            (keydown.enter)="$event.preventDefault(); sendMessage()"
+            rows="1"
+            placeholder="Search any concept, formula, doubt, or exam query... (Press Enter to search)"
+            class="w-full bg-transparent border-none text-slate-800 placeholder-slate-400 text-xs sm:text-sm resize-none focus:outline-none px-2 max-h-32"
+          ></textarea>
+
+          <!-- Search / Ask Button -->
+          <button
+            type="button"
+            (click)="sendMessage()"
+            [disabled]="!currentInput().trim() || isLoading()"
+            class="px-3.5 py-2 rounded-xl font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 text-xs sm:text-sm shadow-sm"
+            [class.bg-[#315FEA]]="currentInput().trim() && !isLoading()"
+            [class.text-white]="currentInput().trim() && !isLoading()"
+            [class.hover:bg-blue-700]="currentInput().trim() && !isLoading()"
+            [class.bg-slate-200]="!currentInput().trim() || isLoading()"
+            [class.text-slate-400]="!currentInput().trim() || isLoading()"
+            [class.cursor-not-allowed]="!currentInput().trim() || isLoading()"
+          >
+            <span>Search</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Quick Prompts Row -->
+        <div class="hidden sm:flex items-center gap-1.5 overflow-x-auto scrollbar-none pt-1">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Try:</span>
+          @for (p of quickPrompts; track p) {
+            <button
+              type="button"
+              (click)="selectPrompt(p)"
+              class="text-[11px] font-medium text-slate-600 hover:text-blue-700 bg-slate-100 hover:bg-blue-50 px-2.5 py-1 rounded-lg border border-slate-200/80 hover:border-blue-200 whitespace-nowrap transition-all cursor-pointer"
+            >
+              {{ p }}
+            </button>
+          }
+        </div>
+
+        <p class="text-[10px] text-slate-400 text-center">
+          ExamSphere AI merges verified syllabus knowledge with adaptive tutoring. Confirm final application deadlines on official websites.
+        </p>
+      </div>
+    </footer>
+
+  </main>
+</div>

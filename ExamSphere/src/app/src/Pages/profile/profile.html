@@ -1,0 +1,1036 @@
+<div class="min-h-screen bg-slate-50/60 pb-20">
+
+  <!-- TOP NOTIFICATION TOAST -->
+  @if (toastMessage) {
+    <div class="fixed top-6 right-6 z-50 animate-in slide-in-from-top-3 duration-200">
+      <div class="flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl text-xs font-bold"
+           [ngClass]="toastType === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path *ngIf="toastType === 'success'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          <path *ngIf="toastType === 'error'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+        <span>{{ toastMessage }}</span>
+      </div>
+    </div>
+  }
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+
+    <!-- BREADCRUMB & HEADER -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
+          <a routerLink="/dashboard" class="hover:text-blue-600">Home</a>
+          <span>/</span>
+          <span class="text-blue-600 font-bold">My Profile</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-[#172F61] tracking-tight">
+          Student Profile & Identity
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+          Manage your personal details, academic background, competitive exam targets, and learning preferences.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a routerLink="/activities" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-blue-600 shadow-xs flex items-center gap-2 transition">
+          <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          View My Activities
+        </a>
+      </div>
+    </div>
+
+    <!-- PROFILE HERO SUMMARY CARD -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 mb-8 relative overflow-hidden">
+      <!-- Decorative background glow -->
+      <div class="absolute -right-16 -top-16 w-64 h-64 bg-blue-100/50 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute right-32 -bottom-20 w-64 h-64 bg-indigo-100/40 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <!-- Avatar and Main Bio -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+          <div class="relative">
+            @if (profile.personal.avatar) {
+              <img [src]="profile.personal.avatar" alt="Avatar" class="w-20 h-20 rounded-2xl object-cover ring-4 ring-blue-50 shadow-md">
+            } @else {
+              <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 text-white font-black text-2xl flex items-center justify-center shadow-lg shadow-blue-200 ring-4 ring-blue-50">
+                {{ userInitials }}
+              </div>
+            }
+            <span class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center text-[10px] text-white">✓</span>
+          </div>
+
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <h2 class="text-xl font-extrabold text-slate-900">{{ profile.personal.fullName }}</h2>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                ● Active Student
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                {{ profile.account.membershipTier }}
+              </span>
+            </div>
+
+            <p class="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-3">
+              <span class="flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+                </svg>
+                {{ userEmail }}
+              </span>
+              <span>•</span>
+              <span class="flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                {{ profile.personal.cityState ? (profile.personal.cityState + ', ' + profile.personal.country) : profile.personal.country }}
+              </span>
+            </p>
+
+            <!-- Target Exams Chips -->
+            <div class="flex flex-wrap items-center gap-1.5 mt-3">
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Targets:</span>
+              @for (exam of profile.examPreferences.targetExams; track exam) {
+                <span class="px-2 py-0.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                  {{ exam }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Completion Meter -->
+        <div class="w-full md:w-64 p-4 rounded-2xl bg-blue-50/60 border border-blue-100 text-left">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-700 mb-1.5">
+            <span>Profile Completion</span>
+            <span class="text-blue-600 font-extrabold">{{ profileCompletion }}%</span>
+          </div>
+          <div class="w-full h-2.5 rounded-full bg-slate-200 overflow-hidden mb-2">
+            <div class="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500" [style.width.%]="profileCompletion"></div>
+          </div>
+          <p class="text-[11px] text-slate-500">
+            Complete academic and exam targets for 100% personalized AI mentoring.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN TWO-COLUMN LAYOUT -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+      <!-- LEFT: TAB NAVIGATION -->
+      <div class="lg:col-span-1 space-y-2">
+        <div class="bg-white rounded-2xl p-2 border border-slate-200/80 shadow-xs space-y-1">
+          <!-- 1. Personal Information -->
+          <button
+            type="button"
+            (click)="setTab('personal')"
+            class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left"
+            [ngClass]="activeTab === 'personal' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-slate-700 hover:bg-slate-100'"
+          >
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              <span>Personal Info</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md" [ngClass]="activeTab === 'personal' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'">Section A</span>
+          </button>
+
+          <!-- 2. Academic Information -->
+          <button
+            type="button"
+            (click)="setTab('academic')"
+            class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left"
+            [ngClass]="activeTab === 'academic' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-slate-700 hover:bg-slate-100'"
+          >
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path>
+              </svg>
+              <span>Academic Details</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md" [ngClass]="activeTab === 'academic' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'">Section B</span>
+          </button>
+
+          <!-- 3. Examination Preferences -->
+          <button
+            type="button"
+            (click)="setTab('exams')"
+            class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left"
+            [ngClass]="activeTab === 'exams' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-slate-700 hover:bg-slate-100'"
+          >
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>Exam Targets</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md" [ngClass]="activeTab === 'exams' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'">Section C</span>
+          </button>
+
+          <!-- 4. Security Information -->
+          <button
+            type="button"
+            (click)="setTab('security')"
+            class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left"
+            [ngClass]="activeTab === 'security' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-slate-700 hover:bg-slate-100'"
+          >
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+              <span>Security & Password</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md" [ngClass]="activeTab === 'security' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'">Section D</span>
+          </button>
+
+          <!-- 5. Learning Preferences -->
+          <button
+            type="button"
+            (click)="setTab('learning')"
+            class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left"
+            [ngClass]="activeTab === 'learning' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-slate-700 hover:bg-slate-100'"
+          >
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span>Learning Preferences</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md" [ngClass]="activeTab === 'learning' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'">Section E</span>
+          </button>
+
+          <!-- 6. Account Information -->
+          <button
+            type="button"
+            (click)="setTab('account')"
+            class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left"
+            [ngClass]="activeTab === 'account' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-slate-700 hover:bg-slate-100'"
+          >
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>Account Info</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md" [ngClass]="activeTab === 'account' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'">Section F</span>
+          </button>
+        </div>
+
+        <!-- Quick Help Card -->
+        <div class="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 border border-blue-100 text-xs text-slate-600 space-y-2">
+          <div class="font-bold text-[#172F61] flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+            AI Mentor Personalization
+          </div>
+          <p class="text-[11px] leading-relaxed text-slate-500">
+            ExamSphere AI customizes mock test questions, syllabus speed, and doubt-solving based on your configured targets.
+          </p>
+        </div>
+      </div>
+
+      <!-- RIGHT: SECTION CONTENT -->
+      <div class="lg:col-span-3">
+
+        <!-- ============================================== -->
+        <!-- SECTION A: PERSONAL INFORMATION -->
+        <!-- ============================================== -->
+        @if (activeTab === 'personal') {
+          <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-200">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+              <div>
+                <h3 class="text-lg font-extrabold text-slate-900">A. Personal Information</h3>
+                <p class="text-xs text-slate-500">Basic identification and contact profile details.</p>
+              </div>
+
+              @if (!isEditingPersonal) {
+                <button
+                  type="button"
+                  (click)="isEditingPersonal = true"
+                  class="px-4 py-2 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-bold flex items-center gap-1.5 transition"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                  </svg>
+                  Edit Profile
+                </button>
+              } @else {
+                <div class="flex items-center gap-2">
+                  <button (click)="cancelPersonal()" class="px-3.5 py-1.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">Cancel</button>
+                  <button (click)="savePersonal()" class="px-4 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 shadow-sm">Save Changes</button>
+                </div>
+              }
+            </div>
+
+            <!-- Avatar Preset Selector -->
+            @if (isEditingPersonal) {
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 mb-6">
+                <label class="block text-xs font-bold text-slate-700 mb-2">Choose Avatar Preset</label>
+                <div class="flex items-center gap-3">
+                  @for (preset of avatarPresets; track preset) {
+                    <button
+                      type="button"
+                      (click)="selectAvatarPreset(preset)"
+                      class="w-12 h-12 rounded-xl p-1 border-2 transition-all hover:scale-105"
+                      [ngClass]="personalForm.avatar === preset ? 'border-blue-600 ring-2 ring-blue-100 bg-white' : 'border-slate-200 bg-white'"
+                    >
+                      <img [src]="preset" alt="Avatar" class="w-full h-full rounded-lg">
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    (click)="personalForm.avatar = ''"
+                    class="px-3 py-1.5 rounded-lg border border-slate-300 text-[11px] font-bold text-slate-600 hover:bg-white"
+                  >
+                    Use Initials
+                  </button>
+                </div>
+              </div>
+            }
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <!-- Full Name -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+                @if (isEditingPersonal) {
+                  <input type="text" [(ngModel)]="personalForm.fullName" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.personal.fullName }}</div>
+                }
+              </div>
+
+              <!-- Email Address -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Registered Email Address</label>
+                <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-600 flex items-center justify-between">
+                  <span>{{ userEmail }}</span>
+                  <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">Verified</span>
+                </div>
+              </div>
+
+              <!-- Phone Number -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Phone Number</label>
+                @if (isEditingPersonal) {
+                  <input type="text" [(ngModel)]="personalForm.phone" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.personal.phone || 'Not provided' }}</div>
+                }
+              </div>
+
+              <!-- Date of Birth -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Date of Birth</label>
+                @if (isEditingPersonal) {
+                  <input type="date" [(ngModel)]="personalForm.dateOfBirth" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.personal.dateOfBirth || 'Not provided' }}</div>
+                }
+              </div>
+
+              <!-- Gender -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Gender</label>
+                @if (isEditingPersonal) {
+                  <select [(ngModel)]="personalForm.gender" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Non-Binary">Non-Binary</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.personal.gender }}</div>
+                }
+              </div>
+
+              <!-- Country -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Country</label>
+                @if (isEditingPersonal) {
+                  <input type="text" [(ngModel)]="personalForm.country" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.personal.country }}</div>
+                }
+              </div>
+
+              <!-- State / City -->
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1">State / City</label>
+                @if (isEditingPersonal) {
+                  <input type="text" [(ngModel)]="personalForm.cityState" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.personal.cityState }}</div>
+                }
+              </div>
+
+              <!-- Bio -->
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Bio / Aspirations</label>
+                @if (isEditingPersonal) {
+                  <textarea [(ngModel)]="personalForm.bio" rows="3" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-medium text-slate-700 leading-relaxed">{{ profile.personal.bio }}</div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ============================================== -->
+        <!-- SECTION B: ACADEMIC INFORMATION -->
+        <!-- ============================================== -->
+        @if (activeTab === 'academic') {
+          <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-200">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+              <div>
+                <h3 class="text-lg font-extrabold text-slate-900">B. Academic Information</h3>
+                <p class="text-xs text-slate-500">Your educational background and qualification details.</p>
+              </div>
+
+              @if (!isEditingAcademic) {
+                <button
+                  type="button"
+                  (click)="isEditingAcademic = true"
+                  class="px-4 py-2 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-bold flex items-center gap-1.5 transition"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                  </svg>
+                  Edit Academic Details
+                </button>
+              } @else {
+                <div class="flex items-center gap-2">
+                  <button (click)="cancelAcademic()" class="px-3.5 py-1.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">Cancel</button>
+                  <button (click)="saveAcademic()" class="px-4 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 shadow-sm">Save Changes</button>
+                </div>
+              }
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <!-- Education Level -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Education Level</label>
+                @if (isEditingAcademic) {
+                  <select [(ngModel)]="academicForm.educationLevel" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="High School">High School (10+2)</option>
+                    <option value="Undergraduate">Undergraduate (B.Tech / B.Sc / BA / etc.)</option>
+                    <option value="Postgraduate">Postgraduate (M.Tech / M.Sc / MA / MBA)</option>
+                    <option value="Doctoral">Doctoral (Ph.D.)</option>
+                    <option value="Other">Other</option>
+                  </select>
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.academic.educationLevel }}</div>
+                }
+              </div>
+
+              <!-- Institution / College / University -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Institution / College / University</label>
+                @if (isEditingAcademic) {
+                  <input type="text" [(ngModel)]="academicForm.institution" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.academic.institution || 'Not specified' }}</div>
+                }
+              </div>
+
+              <!-- Course / Degree -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Course / Degree</label>
+                @if (isEditingAcademic) {
+                  <input type="text" [(ngModel)]="academicForm.course" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.academic.course || 'Not specified' }}</div>
+                }
+              </div>
+
+              <!-- Stream / Specialization -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Stream / Specialization</label>
+                @if (isEditingAcademic) {
+                  <input type="text" [(ngModel)]="academicForm.stream" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.academic.stream || 'Not specified' }}</div>
+                }
+              </div>
+
+              <!-- Current Semester / Year -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Current Semester / Year</label>
+                @if (isEditingAcademic) {
+                  <input type="text" [(ngModel)]="academicForm.currentSemester" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.academic.currentSemester || 'Not specified' }}</div>
+                }
+              </div>
+
+              <!-- Graduation Year -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Graduation Year</label>
+                @if (isEditingAcademic) {
+                  <input type="number" [(ngModel)]="academicForm.graduationYear" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.academic.graduationYear }}</div>
+                }
+              </div>
+
+              <!-- Preferred Academic Language -->
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Preferred Academic Language</label>
+                @if (isEditingAcademic) {
+                  <select [(ngModel)]="academicForm.preferredLanguage" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="English">English</option>
+                    <option value="Hindi">Hindi (हिंदी)</option>
+                    <option value="Bengali">Bengali (বাংলা)</option>
+                    <option value="Telugu">Telugu (తెలుగు)</option>
+                    <option value="Tamil">Tamil (தமிழ்)</option>
+                  </select>
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.academic.preferredLanguage }}</div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ============================================== -->
+        <!-- SECTION C: EXAMINATION PREFERENCES -->
+        <!-- ============================================== -->
+        @if (activeTab === 'exams') {
+          <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-200">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+              <div>
+                <h3 class="text-lg font-extrabold text-slate-900">C. Examination Preferences</h3>
+                <p class="text-xs text-slate-500">Configure your target competitive examinations and study rhythm.</p>
+              </div>
+
+              @if (!isEditingExams) {
+                <button
+                  type="button"
+                  (click)="isEditingExams = true"
+                  class="px-4 py-2 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-bold flex items-center gap-1.5 transition"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                  </svg>
+                  Configure Targets
+                </button>
+              } @else {
+                <div class="flex items-center gap-2">
+                  <button (click)="cancelExams()" class="px-3.5 py-1.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">Cancel</button>
+                  <button (click)="saveExams()" class="px-4 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 shadow-sm">Save Preferences</button>
+                </div>
+              }
+            </div>
+
+            <!-- Target Examinations Multi-Select -->
+            <div class="mb-6">
+              <label class="block text-xs font-bold text-slate-700 mb-2">Target Examination(s)</label>
+              @if (isEditingExams) {
+                <div class="flex flex-wrap gap-2 mb-2">
+                  @for (exam of availableExams; track exam) {
+                    <button
+                      type="button"
+                      (click)="toggleTargetExam(exam)"
+                      class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                      [ngClass]="examForm.targetExams.includes(exam) ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
+                    >
+                      {{ exam }} {{ examForm.targetExams.includes(exam) ? '✓' : '+' }}
+                    </button>
+                  }
+                </div>
+              } @else {
+                <div class="flex flex-wrap gap-2">
+                  @for (exam of profile.examPreferences.targetExams; track exam) {
+                    <span class="px-3.5 py-1.5 rounded-xl bg-blue-50 text-blue-800 text-xs font-extrabold border border-blue-200">
+                      {{ exam }}
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+              <!-- Exam Category -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Primary Exam Category</label>
+                @if (isEditingExams) {
+                  <select [(ngModel)]="examForm.category" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="National">National Level (UPSC, GATE, JEE, NEET)</option>
+                    <option value="State-Level">State Level (State PSC, WBJEE, MHT CET)</option>
+                    <option value="Recruitment">Government Recruitment (SSC, Banking, Railways)</option>
+                    <option value="International">International (GRE, GMAT, TOEFL)</option>
+                  </select>
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.examPreferences.category }}</div>
+                }
+              </div>
+
+              <!-- Target Examination Year -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Target Examination Year</label>
+                @if (isEditingExams) {
+                  <select [(ngModel)]="examForm.targetYear" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option [value]="2025">2025</option>
+                    <option [value]="2026">2026</option>
+                    <option [value]="2027">2027</option>
+                    <option [value]="2028">2028</option>
+                  </select>
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.examPreferences.targetYear }}</div>
+                }
+              </div>
+
+              <!-- Preparation Level -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Current Preparation Level</label>
+                @if (isEditingExams) {
+                  <select [(ngModel)]="examForm.preparationLevel" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="Beginner">Beginner (Starting syllabus foundation)</option>
+                    <option value="Intermediate">Intermediate (50% covered, solving PYQs)</option>
+                    <option value="Advanced">Advanced (Revision & Full Mock Tests)</option>
+                  </select>
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.examPreferences.preparationLevel }}</div>
+                }
+              </div>
+
+              <!-- Daily Study Target -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Daily Study Target (Hours / Day)</label>
+                @if (isEditingExams) {
+                  <input type="number" [(ngModel)]="examForm.dailyStudyTargetHours" min="1" max="16" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.examPreferences.dailyStudyTargetHours }} Hours / day</div>
+                }
+              </div>
+
+              <!-- Preferred Schedule -->
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Preferred Study Schedule</label>
+                @if (isEditingExams) {
+                  <select [(ngModel)]="examForm.preferredSchedule" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="Early Bird (5:00 AM - 9:00 AM)">Early Bird (5:00 AM - 9:00 AM)</option>
+                    <option value="Morning Focus (9:00 AM - 1:00 PM)">Morning Focus (9:00 AM - 1:00 PM)</option>
+                    <option value="Evening (6:00 PM - 10:00 PM)">Evening (6:00 PM - 10:00 PM)</option>
+                    <option value="Night Owl (10:00 PM - 2:00 AM)">Night Owl (10:00 PM - 2:00 AM)</option>
+                  </select>
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.examPreferences.preferredSchedule }}</div>
+                }
+              </div>
+            </div>
+
+            <!-- Preferred Subjects Tags -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-2">Preferred Priority Subjects</label>
+              @if (isEditingExams) {
+                <div class="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    [(ngModel)]="newSubjectInput"
+                    placeholder="Add subject (e.g. Discrete Math)..."
+                    (keydown.enter)="addPreferredSubject()"
+                    class="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  >
+                  <button type="button" (click)="addPreferredSubject()" class="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700">Add</button>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  @for (sub of examForm.preferredSubjects; track sub; let i = $index) {
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 text-slate-700 text-xs font-medium">
+                      {{ sub }}
+                      <button (click)="removePreferredSubject(i)" class="text-slate-400 hover:text-rose-600 font-bold">×</button>
+                    </span>
+                  }
+                </div>
+              } @else {
+                <div class="flex flex-wrap gap-2">
+                  @for (sub of profile.examPreferences.preferredSubjects; track sub) {
+                    <span class="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold">
+                      {{ sub }}
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ============================================== -->
+        <!-- SECTION D: SECURITY INFORMATION -->
+        <!-- ============================================== -->
+        @if (activeTab === 'security') {
+          <div class="space-y-6 animate-in fade-in duration-200">
+            <!-- Password & Auth Card -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+              <div class="pb-4 border-b border-slate-100 mb-6">
+                <h3 class="text-lg font-extrabold text-slate-900">D. Security & Credentials</h3>
+                <p class="text-xs text-slate-500">Manage your login security, password, and two-factor authentication.</p>
+              </div>
+
+              <!-- Password Change Form -->
+              <div class="max-w-xl space-y-4 mb-8">
+                <h4 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Change Password</h4>
+
+                @if (passwordError) {
+                  <div class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
+                    {{ passwordError }}
+                  </div>
+                }
+                @if (passwordSuccess) {
+                  <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
+                    {{ passwordSuccess }}
+                  </div>
+                }
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Current Password</label>
+                  <input type="password" [(ngModel)]="passwordForm.currentPassword" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="••••••••">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">New Password</label>
+                    <input type="password" [(ngModel)]="passwordForm.newPassword" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Min. 6 chars">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Confirm New Password</label>
+                    <input type="password" [(ngModel)]="passwordForm.confirmPassword" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Re-enter password">
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  (click)="handleChangePassword()"
+                  [disabled]="isChangingPassword"
+                  class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-200 transition"
+                >
+                  {{ isChangingPassword ? 'Updating...' : 'Update Password' }}
+                </button>
+              </div>
+
+              <!-- Two Factor Authentication Toggle -->
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-xs font-bold text-slate-900">Two-Factor Authentication (2FA)</div>
+                    <div class="text-[11px] text-slate-500">Require an authenticator code or SMS verification upon login.</div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  (click)="handleToggle2FA()"
+                  class="px-4 py-2 rounded-xl text-xs font-bold transition-all"
+                  [ngClass]="profile.security.twoFactorEnabled ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'"
+                >
+                  {{ profile.security.twoFactorEnabled ? '2FA Enabled ✓' : 'Enable 2FA' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Active Sessions & Devices -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+              <div class="pb-4 border-b border-slate-100 mb-6">
+                <h3 class="text-base font-extrabold text-slate-900">Active Sessions & Login History</h3>
+                <p class="text-xs text-slate-500">Devices currently logged into your ExamSphere AI account.</p>
+              </div>
+
+              <div class="space-y-3">
+                @for (session of profile.security.activeSessions; track session.sessionId) {
+                  <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="text-xs font-bold text-slate-900 flex items-center gap-2">
+                          {{ session.device }}
+                          @if (session.current) {
+                            <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800">This Device</span>
+                          }
+                        </div>
+                        <div class="text-[10px] text-slate-500">IP: {{ session.ip }} • Active: {{ session.lastActive | date:'medium' }}</div>
+                      </div>
+                    </div>
+
+                    @if (!session.current) {
+                      <button
+                        type="button"
+                        (click)="terminateSession(session.sessionId)"
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100"
+                      >
+                        Terminate
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Danger Zone: Delete Account -->
+            <div class="bg-rose-50/50 rounded-3xl p-6 sm:p-8 border border-rose-200">
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <h4 class="text-sm font-extrabold text-rose-900">Delete Account & Student Data</h4>
+                  <p class="text-xs text-rose-700 mt-0.5">Permanently delete your profile, mock test attempts, and study analytics. This action cannot be undone.</p>
+                </div>
+                <button
+                  type="button"
+                  (click)="showDeleteModal = true"
+                  class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition"
+                >
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ============================================== -->
+        <!-- SECTION E: LEARNING PREFERENCES -->
+        <!-- ============================================== -->
+        @if (activeTab === 'learning') {
+          <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-200">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+              <div>
+                <h3 class="text-lg font-extrabold text-slate-900">E. Learning Preferences</h3>
+                <p class="text-xs text-slate-500">Customize AI tutoring tone, reminders, notifications, and interface.</p>
+              </div>
+
+              @if (!isEditingLearning) {
+                <button
+                  type="button"
+                  (click)="isEditingLearning = true"
+                  class="px-4 py-2 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-bold flex items-center gap-1.5 transition"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                  </svg>
+                  Customize
+                </button>
+              } @else {
+                <div class="flex items-center gap-2">
+                  <button (click)="cancelLearning()" class="px-3.5 py-1.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">Cancel</button>
+                  <button (click)="saveLearning()" class="px-4 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 shadow-sm">Save Changes</button>
+                </div>
+              }
+            </div>
+
+            <div class="space-y-6">
+              <!-- AI Response Style -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">AI Tutor Response Style</label>
+                @if (isEditingLearning) {
+                  <select [(ngModel)]="learningForm.aiResponseStyle" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="Step-by-Step with Detailed Solutions">Step-by-Step with Detailed Solutions (Comprehensive)</option>
+                    <option value="Concise & Exam Focused">Concise & Exam Focused (Speed & Formulas)</option>
+                    <option value="Concept First & Real-World Analogies">Concept First & Real-World Analogies (Intuitive)</option>
+                  </select>
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800">{{ profile.learningPreferences.aiResponseStyle }}</div>
+                }
+              </div>
+
+              <!-- Daily Study Reminder -->
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div class="text-xs font-bold text-slate-900">Daily Preparation Reminder</div>
+                  <div class="text-[11px] text-slate-500">Receive a daily prompt to maintain your learning streak.</div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  @if (isEditingLearning) {
+                    <input type="time" [(ngModel)]="learningForm.reminderTime" class="px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" [(ngModel)]="learningForm.dailyStudyReminder" class="sr-only peer">
+                      <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                  } @else {
+                    <span class="text-xs font-bold text-slate-700">
+                      {{ profile.learningPreferences.dailyStudyReminder ? 'Active at ' + profile.learningPreferences.reminderTime : 'Disabled' }}
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <!-- Notification Checkboxes -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-3">Notification Preferences</label>
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white">
+                    <div>
+                      <div class="text-xs font-bold text-slate-800">Exam Deadlines & Official Alerts</div>
+                      <div class="text-[11px] text-slate-500">Admit card dates, application window updates.</div>
+                    </div>
+                    @if (isEditingLearning) {
+                      <input type="checkbox" [(ngModel)]="learningForm.notificationPreferences.examAlerts" class="w-4 h-4 text-blue-600 rounded">
+                    } @else {
+                      <span class="text-xs font-bold" [ngClass]="profile.learningPreferences.notificationPreferences.examAlerts ? 'text-emerald-600' : 'text-slate-400'">
+                        {{ profile.learningPreferences.notificationPreferences.examAlerts ? 'Enabled' : 'Disabled' }}
+                      </span>
+                    }
+                  </div>
+
+                  <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white">
+                    <div>
+                      <div class="text-xs font-bold text-slate-800">Mock Test & Performance Reminders</div>
+                      <div class="text-[11px] text-slate-500">Weekly test targets and revision suggestions.</div>
+                    </div>
+                    @if (isEditingLearning) {
+                      <input type="checkbox" [(ngModel)]="learningForm.notificationPreferences.mockTestReminders" class="w-4 h-4 text-blue-600 rounded">
+                    } @else {
+                      <span class="text-xs font-bold" [ngClass]="profile.learningPreferences.notificationPreferences.mockTestReminders ? 'text-emerald-600' : 'text-slate-400'">
+                        {{ profile.learningPreferences.notificationPreferences.mockTestReminders ? 'Enabled' : 'Disabled' }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Interface Theme -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Color Theme</label>
+                @if (isEditingLearning) {
+                  <select [(ngModel)]="learningForm.theme" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="light">Light Theme (Default)</option>
+                    <option value="dark">Dark Theme (Night Mode)</option>
+                    <option value="system">Follow System Preferences</option>
+                  </select>
+                } @else {
+                  <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-800 capitalize">{{ profile.learningPreferences.theme }}</div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ============================================== -->
+        <!-- SECTION F: ACCOUNT INFORMATION -->
+        <!-- ============================================== -->
+        @if (activeTab === 'account') {
+          <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-200">
+            <div class="pb-4 border-b border-slate-100 mb-6">
+              <h3 class="text-lg font-extrabold text-slate-900">F. Account & Membership Details</h3>
+              <p class="text-xs text-slate-500">System identifier, tier subscription, and registration timestamps.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
+              <!-- User ID -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Student User ID</label>
+                <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-mono font-bold text-slate-800 flex items-center justify-between">
+                  <span>{{ profile.account.userId || 'USR-EXAM-PRO' }}</span>
+                  <button (click)="copyUserId()" class="text-blue-600 hover:text-blue-800 text-[11px] font-bold">Copy</button>
+                </div>
+              </div>
+
+              <!-- Account Status -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Account Status</label>
+                <div class="px-3.5 py-2.5 rounded-xl bg-emerald-50 text-xs font-bold text-emerald-800 border border-emerald-100 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  {{ profile.account.status }}
+                </div>
+              </div>
+
+              <!-- Membership Tier -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Membership Plan</label>
+                <div class="px-3.5 py-2.5 rounded-xl bg-blue-50 text-xs font-bold text-blue-800 border border-blue-100">
+                  {{ profile.account.membershipTier }} (All Access)
+                </div>
+              </div>
+
+              <!-- Referral / Coupon Code -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Personal Referral Code</label>
+                <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-mono font-bold text-slate-800">
+                  {{ profile.account.referralCode }}
+                </div>
+              </div>
+
+              <!-- Account Created -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Account Creation Date</label>
+                <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-700">
+                  {{ profile.account.createdAt | date:'mediumDate' }}
+                </div>
+              </div>
+
+              <!-- Last Login -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Last Login Activity</label>
+                <div class="px-3.5 py-2.5 rounded-xl bg-slate-50 text-xs font-semibold text-slate-700">
+                  {{ profile.account.lastLogin | date:'medium' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Pro Plan Features Card -->
+            <div class="p-5 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-md">
+              <div class="flex items-center justify-between gap-4 mb-3">
+                <span class="text-xs font-extrabold uppercase tracking-wider text-blue-200">Included In Your Plan</span>
+                <span class="px-2 py-0.5 rounded-md bg-white/20 text-[10px] font-bold">Unlimited</span>
+              </div>
+              <ul class="text-xs space-y-2 text-blue-50 font-medium">
+                <li class="flex items-center gap-2">✓ Unlimited AI Examination Mentor doubt solving</li>
+                <li class="flex items-center gap-2">✓ AI-Generated Mock Tests with step-by-step solutions</li>
+                <li class="flex items-center gap-2">✓ 10+ Years Previous-Year Question Bank with verified answer keys</li>
+                <li class="flex items-center gap-2">✓ Adaptive Syllabus Learning Roadmap & Streak Tracker</li>
+              </ul>
+            </div>
+          </div>
+        }
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE ACCOUNT CONFIRMATION MODAL -->
+@if (showDeleteModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+    <div class="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-150">
+      <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mb-4">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+      </div>
+
+      <h3 class="text-lg font-extrabold text-slate-900 mb-2">Delete Student Account?</h3>
+      <p class="text-xs text-slate-500 leading-relaxed mb-6">
+        This will permanently erase your ExamSphere AI profile, mock test scores, saved questions, and personalized study planner. Are you sure you want to proceed?
+      </p>
+
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          (click)="showDeleteModal = false"
+          class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50"
+        >
+          Keep Account
+        </button>
+        <button
+          type="button"
+          (click)="showDeleteModal = false; showToast('Account deletion simulated in demo mode.', 'error')"
+          class="flex-1 py-2.5 rounded-xl bg-rose-600 text-white text-xs font-bold hover:bg-rose-700 shadow-md shadow-rose-200"
+        >
+          Confirm Delete
+        </button>
+      </div>
+    </div>
+  </div>
+}

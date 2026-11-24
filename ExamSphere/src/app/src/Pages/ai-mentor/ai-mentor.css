@@ -1,0 +1,26 @@
+/* AI Examination Mentor Custom Styles */
+:host {
+  display: block;
+}
+
+/* Custom scrollbar styling */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Flashcard 3D perspective effect */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Focus and active outlines */
+button:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #315FEA;
+  outline-offset: 1px;
+}

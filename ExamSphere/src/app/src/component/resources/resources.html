@@ -1,0 +1,804 @@
+<div class="min-h-screen bg-[#F8FAFF] text-[#172F61] font-sans antialiased">
+
+  <!-- Hero & Exam-Based Resource Generator -->
+  <section class="relative overflow-hidden bg-gradient-to-b from-white via-[#F4F7FE] to-[#F8FAFF] pt-10 pb-12 border-b border-slate-200/70">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto text-center mb-8">
+        <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#315FEA] border border-blue-200/80 mb-3">
+          📚 Verified Academic Resources • Database-Backed Ecosystem
+        </span>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#172F61] leading-tight">
+          One Examination. <span class="text-[#315FEA]">Complete Preparation Library.</span>
+        </h1>
+        <p class="mt-3 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto">
+          Access authentic standard textbooks, official syllabi, solved 10-year PYQ archives, formula sheets, and curated video courses connected to your dynamic preparation workspace.
+        </p>
+      </div>
+
+      <!-- Exam Workspace Generator Box -->
+      <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg shadow-blue-950/5 border border-slate-200 p-5 sm:p-7">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          <div class="md:col-span-6">
+            <label for="examInput" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+              Find Your Examination Workspace
+            </label>
+            <input
+              id="examInput"
+              type="text"
+              [value]="examQuery()"
+              (input)="examQuery.set($any($event.target).value)"
+              (keyup.enter)="generateWorkspace()"
+              placeholder="e.g., GATE Computer Science, UPSC CSE, JEE Main, NEET UG, SSC CGL..."
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium text-[#172F61] focus:outline-none focus:ring-2 focus:ring-[#315FEA] focus:border-[#315FEA]"
+            />
+          </div>
+
+          <div class="md:col-span-3">
+            <span class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+              Target Level
+            </span>
+            <div class="grid grid-cols-3 gap-1 p-1 rounded-xl bg-slate-100 border border-slate-200">
+              @for (lvl of levels; track lvl) {
+                <button
+                  type="button"
+                  (click)="setLevel(lvl)"
+                  [class]="
+                    selectedLevel() === lvl
+                      ? 'py-2 rounded-lg text-xs font-bold bg-white text-[#315FEA] shadow-sm transition cursor-pointer'
+                      : 'py-2 rounded-lg text-xs font-medium text-slate-600 hover:text-[#172F61] transition cursor-pointer'
+                  "
+                >
+                  {{ lvl }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="md:col-span-3">
+            <button
+              type="button"
+              (click)="generateWorkspace()"
+              [disabled]="isGenerating()"
+              class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#315FEA] to-[#4F46E5] hover:from-[#244FD8] hover:to-[#4338CA] text-white font-bold text-xs shadow-md shadow-blue-600/20 transition disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2"
+            >
+              @if (isGenerating()) {
+                <span class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                <span>Generating...</span>
+              } @else {
+                <span>⚡ Load Workspace</span>
+              }
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Presets -->
+        <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
+          <span class="text-xs font-semibold text-slate-500">Popular Exams:</span>
+          @for (preset of quickExamPresets; track preset) {
+            <button
+              type="button"
+              (click)="selectPreset(preset)"
+              [class]="
+                activeExamKey() === preset
+                  ? 'px-3 py-1 rounded-full text-xs font-bold bg-[#172F61] text-white transition cursor-pointer'
+                  : 'px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 hover:bg-blue-50 hover:text-[#315FEA] transition cursor-pointer'
+              "
+            >
+              {{ preset }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Generated Exam Workspace Dashboard -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+      
+      <!-- Workspace Top Header -->
+      <div class="bg-[#172F61] text-white px-6 py-6 sm:px-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div>
+          <div class="flex flex-wrap items-center gap-2 text-xs mb-1.5">
+            <span class="px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 font-bold uppercase tracking-wider">
+              {{ currentWorkspace().category }}
+            </span>
+            <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 font-semibold">
+              {{ currentWorkspace().officialBody }}
+            </span>
+            <span class="text-slate-300">• Verified: {{ currentWorkspace().lastVerified }}</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            {{ currentWorkspace().examName }}
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-300 mt-1">
+            Tailored for <strong class="text-white">{{ currentWorkspace().level }}</strong> Level • Database Verified Syllabus & Resources
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button
+            type="button"
+            (click)="startPreparationForCurrentExam()"
+            class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-black text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>⚡</span>
+            <span>Start Prep</span>
+          </button>
+          <button
+            type="button"
+            (click)="exploreSyllabusForCurrentExam()"
+            class="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>📖 Syllabus Explorer</span>
+          </button>
+          <div class="px-3.5 py-2 rounded-xl bg-white/10 border border-white/15 text-center">
+            <div class="text-[10px] uppercase tracking-wider text-blue-200 font-bold">Readiness</div>
+            <div class="text-lg font-extrabold text-white">{{ currentWorkspace().readinessIndex }}%</div>
+          </div>
+          <div class="px-3.5 py-2 rounded-xl bg-white/10 border border-white/15 text-center">
+            <div class="text-[10px] uppercase tracking-wider text-amber-200 font-bold">Streak</div>
+            <div class="text-lg font-extrabold text-white">{{ currentWorkspace().streakDays }}d</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 Core Workspace KPI Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 p-6 sm:px-8 bg-[#F4F7FE]/70 border-b border-slate-200/80">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div class="text-2xl font-extrabold text-[#315FEA]">{{ currentWorkspace().stats.subjects }}</div>
+          <div class="text-xs font-semibold text-slate-600 mt-0.5">Syllabus Subjects</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div class="text-2xl font-extrabold text-[#172F61]">{{ currentWorkspace().stats.resources }}</div>
+          <div class="text-xs font-semibold text-slate-600 mt-0.5">Verified Resources & Notes</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div class="text-2xl font-extrabold text-[#7C3AED]">{{ currentWorkspace().stats.mockTests }}</div>
+          <div class="text-xs font-semibold text-slate-600 mt-0.5">Adaptive Mock Tests</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div class="text-2xl font-extrabold text-emerald-600">{{ currentWorkspace().stats.pyqPapers }}</div>
+          <div class="text-xs font-semibold text-slate-600 mt-0.5">Verified PYQ Papers</div>
+        </div>
+      </div>
+
+      <!-- Workspace Main Grid: Syllabus Modules + AI Weakness/Revision Loop -->
+      <div class="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Left 7 Cols: Preparation Modules & Interactive Chapter Explorer -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-extrabold text-[#172F61]">Syllabus Modules & Chapter Weightage</h3>
+              <p class="text-xs text-slate-500">Select any subject to inspect chapter breakdown, yield importance, and academic notes.</p>
+            </div>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                (click)="jumpToLibraryCategory('Standard Textbook')"
+                class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-[#315FEA] hover:bg-blue-100 transition cursor-pointer"
+              >
+                Textbooks
+              </button>
+              <button
+                type="button"
+                (click)="jumpToLibraryCategory('Notes')"
+                class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#315FEA] text-white hover:bg-[#254EDB] transition cursor-pointer"
+              >
+                Revision Notes
+              </button>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            @for (mod of currentWorkspace().modules; track mod.id) {
+              <div
+                (click)="selectModule(mod.id)"
+                [class]="
+                  selectedModule().id === mod.id
+                    ? 'p-4 rounded-2xl border-2 border-[#315FEA] bg-blue-50/40 cursor-pointer transition'
+                    : 'p-4 rounded-2xl border border-slate-200 hover:border-blue-300 bg-white cursor-pointer transition'
+                "
+              >
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <div>
+                    <span class="font-bold text-sm text-[#172F61]">{{ mod.subject }}</span>
+                    <span class="ml-2 text-xs text-slate-500">({{ mod.weightage }})</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span
+                      [class]="
+                        mod.status === 'Strong'
+                          ? 'px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700'
+                          : mod.status === 'Weak Area'
+                            ? 'px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700'
+                            : mod.status === 'In Progress'
+                              ? 'px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700'
+                              : 'px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600'
+                      "
+                    >
+                      {{ mod.status }}
+                    </span>
+                    <span class="text-xs font-extrabold text-[#172F61]">{{ mod.progress }}%</span>
+                  </div>
+                </div>
+                <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    class="h-full rounded-full transition-all duration-300"
+                    [style.width.%]="mod.progress"
+                    [class]="
+                      mod.status === 'Strong'
+                        ? 'bg-emerald-500'
+                        : mod.status === 'Weak Area'
+                          ? 'bg-rose-500'
+                          : 'bg-[#315FEA]'
+                    "
+                  ></div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Selected Module Chapter Breakdown -->
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <h4 class="text-sm font-bold text-[#172F61]">
+                Chapter Breakdown: {{ selectedModule().subject }}
+              </h4>
+              <button
+                type="button"
+                (click)="openTutorWithTopic(selectedModule().subject)"
+                class="text-xs font-bold text-[#7C3AED] hover:underline cursor-pointer"
+              >
+                Ask AI to Explain Module →
+              </button>
+            </div>
+            <div class="space-y-2">
+              @for (topic of selectedModule().topics; track topic.name) {
+                <div class="flex items-center justify-between bg-white px-3.5 py-2.5 rounded-xl border border-slate-200/70 text-xs">
+                  <div class="flex items-center gap-2.5">
+                    <span
+                      [class]="
+                        topic.done
+                          ? 'w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold'
+                          : 'w-4 h-4 rounded-full border-2 border-slate-300'
+                      "
+                    >
+                      {{ topic.done ? '✓' : '' }}
+                    </span>
+                    <span [class]="topic.done ? 'font-medium text-slate-700' : 'font-semibold text-[#172F61]'">
+                      {{ topic.name }}
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span
+                      [class]="
+                        topic.importance === 'High'
+                          ? 'px-2 py-0.5 rounded bg-amber-50 text-amber-800 font-semibold text-[11px]'
+                          : 'px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium text-[11px]'
+                      "
+                    >
+                      {{ topic.importance }} Yield
+                    </span>
+                    <button
+                      type="button"
+                      (click)="openTutorWithTopic(topic.name)"
+                      class="px-2 py-1 rounded bg-blue-50 text-[#315FEA] font-bold text-[11px] hover:bg-blue-100 cursor-pointer"
+                    >
+                      AI Notes
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Right 5 Cols: Continuous Learning Cycle (Weakness Detector + Mistake Notebook + Smart Revision + Timetable) -->
+        <div class="lg:col-span-5 space-y-6">
+          <!-- AI Weakness Detector & Mistake Notebook -->
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-[#172F61] to-[#233E7A] text-white shadow-md">
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/20 text-rose-200 border border-rose-400/30">
+                Continuous AI Learning Loop
+              </span>
+              <span class="text-[11px] text-blue-200">Weakness → Revision</span>
+            </div>
+            <h3 class="text-base font-bold">AI Weakness Detector & Mistake Notebook</h3>
+            <p class="text-xs text-blue-100 mt-1">
+              Detected Gap: <strong class="text-white">{{ currentWorkspace().weaknessLoop.weakTopic }}</strong>
+            </p>
+            <div class="mt-3 p-3 rounded-xl bg-white/10 border border-white/10 text-xs space-y-1.5">
+              <div class="text-amber-300 font-semibold">• {{ currentWorkspace().weaknessLoop.errorRate }}</div>
+              <div class="text-slate-200">• Mistake Log: {{ currentWorkspace().weaknessLoop.mistakeNote }}</div>
+              <div class="text-emerald-300 font-semibold">• Smart Revision: {{ currentWorkspace().weaknessLoop.nextRevisionAction }}</div>
+            </div>
+            <button
+              type="button"
+              (click)="openTutorWithTopic(currentWorkspace().weaknessLoop.weakTopic)"
+              class="mt-3.5 w-full py-2.5 rounded-xl bg-white text-[#172F61] font-bold text-xs hover:bg-blue-50 transition cursor-pointer"
+            >
+              Fix Weak Area with AI Tutor →
+            </button>
+          </div>
+
+          <!-- Spaced Repetition Flashcard Widget (2-3-5-7 Method) -->
+          <div class="p-5 rounded-2xl bg-purple-50/70 border border-purple-200/80">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-[#7C3AED]">
+                Smart Flashcard (2-3-5-7 Spaced Recall)
+              </span>
+              <span class="text-[11px] font-semibold text-slate-500">{{ currentWorkspace().flashcard.tag }}</span>
+            </div>
+            <div
+              (click)="toggleFlashcard()"
+              class="p-4 rounded-xl bg-white border border-purple-200 cursor-pointer hover:shadow-sm transition min-h-[104px] flex flex-col justify-between"
+            >
+              <p class="text-sm font-semibold text-[#172F61]">
+                {{ flashcardFlipped() ? currentWorkspace().flashcard.back : currentWorkspace().flashcard.front }}
+              </p>
+              <div class="mt-3 flex items-center justify-between text-[11px] text-[#7C3AED] font-bold">
+                <span>{{ flashcardFlipped() ? '✓ Answer Revealed' : 'Click card to flip answer' }}</span>
+                <span>Flip ↻</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Today's Adaptive AI Study Planner -->
+          <div class="p-5 rounded-2xl bg-white border border-slate-200">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-[#172F61]">Today’s Adaptive AI Study Plan</h3>
+              <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Auto-Adjusted</span>
+            </div>
+            <div class="space-y-2.5">
+              @for (slot of currentWorkspace().dailyPlan; track slot.time) {
+                <div class="flex items-start gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 text-xs">
+                  <span class="font-bold text-[#315FEA] shrink-0">{{ slot.time }}</span>
+                  <div class="flex-1">
+                    <div class="font-semibold text-[#172F61]">{{ slot.task }}</div>
+                    <span class="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600">
+                      {{ slot.tag }}
+                    </span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-6 py-3 bg-slate-50 border-t border-slate-200/80 text-[11px] text-slate-500 flex flex-wrap items-center justify-between gap-2">
+        <span>
+          <strong>Data Verification:</strong> All textbooks, syllabi, and solved shift papers are sourced from recognized academic publishers and official examination boards.
+        </span>
+        <span>Exam Readiness reflects syllabus & mock test metrics.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 Major Resource Ecosystem Modules -->
+  @if (!focusMode()) {
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-[#315FEA]">Complete Preparation Ecosystem</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-[#172F61] mt-1">
+            12 Integrated Study, Practice & Intelligence Modules
+          </h2>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-600 max-w-md">
+          Standard textbooks, syllabi, previous papers, formula handbooks, and AI mentors in one unified dashboard.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        @for (sec of twelveSections; track sec.number) {
+          <div class="bg-white rounded-2xl border border-slate-200/90 p-5 hover:shadow-md hover:border-blue-300 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="w-8 h-8 rounded-lg bg-blue-50 text-[#315FEA] font-extrabold text-xs flex items-center justify-center">
+                  {{ sec.number }}
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700">
+                  {{ sec.badge }}
+                </span>
+              </div>
+              <h3 class="text-base font-bold text-[#172F61]">{{ sec.title }}</h3>
+              <p class="text-xs text-slate-600 mt-1 leading-relaxed">{{ sec.subtitle }}</p>
+              <ul class="mt-3.5 space-y-1.5">
+                @for (bullet of sec.bullets; track bullet) {
+                  <li class="text-xs text-slate-700 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#315FEA]"></span>
+                    <span>{{ bullet }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <button
+                type="button"
+                (click)="jumpToLibraryCategory(sec.targetCategory)"
+                class="text-xs font-bold text-[#315FEA] hover:text-[#172F61] transition cursor-pointer"
+              >
+                {{ sec.actionLabel }} →
+              </button>
+              <button
+                type="button"
+                (click)="openTutorWithTopic(sec.title)"
+                class="text-[11px] font-semibold text-slate-500 hover:text-[#7C3AED] cursor-pointer"
+              >
+                AI Guide
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Hybrid Universal Resource Library with Live Database Filters -->
+    <section id="universal-library" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+        
+        <!-- Header & Search Controls -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#7C3AED]">Universal Verified Library</span>
+            <h2 class="text-2xl font-extrabold text-[#172F61] mt-0.5">
+              Browse & Filter Examination Resources
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Showing <strong class="text-[#315FEA]">{{ filteredLibraryItems().length }}</strong> verified textbooks, notes, papers & guides
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2.5">
+            <input
+              type="text"
+              [value]="librarySearch()"
+              (input)="librarySearch.set($any($event.target).value)"
+              placeholder="Search title, author (CLRS, Laxmikanth), subject..."
+              class="px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-[#172F61] focus:outline-none focus:ring-2 focus:ring-[#315FEA] w-full sm:w-64"
+            />
+            <select
+              [value]="libraryExamFilter()"
+              (change)="libraryExamFilter.set($any($event.target).value)"
+              class="px-3 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium text-[#172F61] bg-white focus:outline-none focus:ring-2 focus:ring-[#315FEA]"
+            >
+              @for (ex of availableExams(); track ex) {
+                <option [value]="ex">{{ ex }}</option>
+              }
+            </select>
+            <select
+              [value]="selectedFormatFilter()"
+              (change)="selectedFormatFilter.set($any($event.target).value)"
+              class="px-3 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium text-[#172F61] bg-white focus:outline-none focus:ring-2 focus:ring-[#315FEA]"
+            >
+              <option value="All">All Formats</option>
+              <option value="PDF">PDF</option>
+              <option value="Video">Video</option>
+              <option value="Flashcard Deck">Flashcards</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Category Filter Pills -->
+        <div class="flex flex-wrap gap-2 pb-6 border-b border-slate-200/80">
+          @for (cat of libraryFilters; track cat) {
+            <button
+              type="button"
+              (click)="selectLibraryFilter(cat)"
+              [class]="
+                selectedFilter() === cat
+                  ? 'px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#315FEA] text-white shadow-sm transition cursor-pointer'
+                  : 'px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 hover:text-[#315FEA] transition cursor-pointer'
+              "
+            >
+              {{ cat }}
+            </button>
+          }
+        </div>
+
+        <!-- Filtered Library Cards Grid -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+          @for (item of filteredLibraryItems(); track item.id) {
+            <div class="p-5 rounded-2xl border border-slate-200 hover:border-blue-400 bg-white hover:shadow-md flex flex-col justify-between gap-3 transition group">
+              <div>
+                <!-- Top Badges & Actions -->
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <div class="flex items-center gap-1.5">
+                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-blue-100/80 text-[#315FEA] uppercase tracking-wider">
+                      {{ item.resourceType }}
+                    </span>
+                    <span
+                      [class]="
+                        item.sourceType === 'Official Verified'
+                          ? 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : item.sourceType === 'Standard Academic'
+                            ? 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200'
+                            : 'px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 text-slate-700'
+                      "
+                    >
+                      {{ item.sourceType }}
+                    </span>
+                  </div>
+
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-amber-500">★ {{ item.rating }}</span>
+                    <button
+                      type="button"
+                      (click)="toggleBookmark(item.id)"
+                      [class]="
+                        item.bookmarked
+                          ? 'text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 cursor-pointer'
+                          : 'text-xs font-medium text-slate-400 hover:text-slate-700 cursor-pointer'
+                      "
+                    >
+                      {{ item.bookmarked ? '★ Saved' : '☆ Save' }}
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Resource Title & Author -->
+                <h3 class="text-sm sm:text-base font-extrabold text-[#172F61] group-hover:text-[#315FEA] transition leading-snug">
+                  {{ item.title }}
+                </h3>
+                <p class="text-xs font-semibold text-slate-700 mt-1">
+                  By: <span class="text-[#172F61]">{{ item.authorOrPublisher }}</span>
+                </p>
+
+                <!-- Exam & Chapter Context -->
+                <p class="text-xs text-slate-500 mt-1">
+                  <span class="font-medium text-indigo-700">{{ item.examName }}</span> • {{ item.subject }} ({{ item.chapter }})
+                </p>
+
+                <!-- Description Snippet -->
+                <p class="text-xs text-slate-600 mt-2 line-clamp-2 leading-relaxed">
+                  {{ item.description }}
+                </p>
+              </div>
+
+              <!-- Footer Metadata & Buttons -->
+              <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span class="text-slate-500 text-[11px] font-medium">
+                  {{ item.fileSizeOrDuration }} • {{ item.verifiedYear }}
+                </span>
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    (click)="openResourceModal(item)"
+                    class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] transition cursor-pointer"
+                  >
+                    Details
+                  </button>
+                  @if (item.externalUrl || item.downloadUrl) {
+                    <button
+                      type="button"
+                      (click)="openExternalResource(item.externalUrl || item.downloadUrl)"
+                      class="px-3 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-[11px] transition cursor-pointer flex items-center gap-1"
+                    >
+                      <span>📥</span>
+                      <span>Access</span>
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    (click)="openTutorWithTopic(item.title)"
+                    class="px-3 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#315FEA] font-bold text-[11px] transition cursor-pointer flex items-center gap-1"
+                  >
+                    <span>🤖</span>
+                    <span>AI Tutor</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <div class="col-span-full py-12 text-center text-sm text-slate-500 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+              <div class="text-3xl mb-2">🔍</div>
+              <h4 class="font-bold text-slate-800">No resources matched your filter criteria</h4>
+              <p class="text-xs text-slate-500 mt-1">Try clearing search terms or switching to <strong>All Resources</strong>.</p>
+              <button
+                type="button"
+                (click)="selectedFilter.set('All Resources'); libraryExamFilter.set('All Exams'); librarySearch.set('')"
+                class="mt-3 px-4 py-2 bg-[#315FEA] text-white text-xs font-bold rounded-xl cursor-pointer"
+              >
+                Reset Filters
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Unique AI Intelligence Capabilities -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
+      <div class="mb-6">
+        <span class="text-xs font-bold uppercase tracking-wider text-[#315FEA]">AI Intelligence Layer</span>
+        <h2 class="text-2xl font-extrabold text-[#172F61] mt-1">
+          Built-In Adaptive Engines That Power Every Resource
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        @for (feat of uniqueAiFeatures; track feat.name) {
+          <div
+            [class]="
+              feat.highlight
+                ? 'p-4 rounded-2xl bg-blue-50/70 border border-blue-200'
+                : 'p-4 rounded-2xl bg-white border border-slate-200'
+            "
+          >
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <h3 class="text-sm font-bold text-[#172F61]">{{ feat.name }}</h3>
+              @if (feat.highlight) {
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#315FEA] text-white">Core Loop</span>
+              }
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">{{ feat.desc }}</p>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- ==================== RESOURCE DETAIL MODAL ==================== -->
+  @if (selectedResourceForModal()) {
+    <div class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-fadeIn">
+        
+        <!-- Header -->
+        <div class="p-6 bg-gradient-to-r from-indigo-950 to-[#172F61] text-white flex justify-between items-start">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-200 border border-blue-400/30">
+                {{ selectedResourceForModal()!.resourceType }}
+              </span>
+              <span class="text-xs text-slate-300">★ {{ selectedResourceForModal()!.rating }} ({{ selectedResourceForModal()!.downloadsCount }} reads)</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black">{{ selectedResourceForModal()!.title }}</h2>
+            <p class="text-xs text-slate-300 mt-1">By: {{ selectedResourceForModal()!.authorOrPublisher }}</p>
+          </div>
+          <button (click)="closeResourceModal()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-base font-bold cursor-pointer">
+            ✕
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 space-y-4 text-xs sm:text-sm text-slate-700 max-h-[70vh] overflow-y-auto">
+          <div>
+            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider mb-1">Academic Context</h4>
+            <p class="text-slate-600">
+              <strong>Exam:</strong> {{ selectedResourceForModal()!.examName }} • <strong>Subject:</strong> {{ selectedResourceForModal()!.subject }} ({{ selectedResourceForModal()!.chapter }})
+            </p>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider mb-1">Summary & Content Scope</h4>
+            <p class="leading-relaxed text-slate-600">{{ selectedResourceForModal()!.description }}</p>
+          </div>
+
+          @if (selectedResourceForModal()!.topics && selectedResourceForModal()!.topics.length > 0) {
+            <div>
+              <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider mb-2">Key Topics Covered</h4>
+              <div class="flex flex-wrap gap-1.5">
+                @for (t of selectedResourceForModal()!.topics; track t) {
+                  <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-900 font-semibold text-xs border border-blue-100">
+                    {{ t }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="text-xs text-slate-400 block font-medium">Format & Size</span>
+              <strong class="text-slate-800 text-xs">{{ selectedResourceForModal()!.fileFormat }} • {{ selectedResourceForModal()!.fileSizeOrDuration }}</strong>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="text-xs text-slate-400 block font-medium">Edition / Verification</span>
+              <strong class="text-slate-800 text-xs">{{ selectedResourceForModal()!.verifiedYear }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-5 bg-slate-50 border-t border-slate-200 flex flex-wrap justify-between items-center gap-2">
+          <button (click)="closeResourceModal()" class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs cursor-pointer">
+            Close
+          </button>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="openTutorWithTopic(selectedResourceForModal()!.title); closeResourceModal();"
+              class="px-4 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs border border-indigo-200 cursor-pointer flex items-center gap-1.5"
+            >
+              <span>🤖</span>
+              <span>Ask AI Tutor</span>
+            </button>
+            @if (selectedResourceForModal()!.externalUrl || selectedResourceForModal()!.downloadUrl) {
+              <button
+                type="button"
+                (click)="openExternalResource(selectedResourceForModal()!.externalUrl || selectedResourceForModal()!.downloadUrl)"
+                class="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs shadow-md cursor-pointer flex items-center gap-1.5"
+              >
+                <span>📥</span>
+                <span>Open Source Portal →</span>
+              </button>
+            }
+          </div>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- Interactive AI Personal Tutor Slide-Over Drawer -->
+  @if (tutorOpen()) {
+    <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex justify-end">
+      <div class="w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between border-l border-slate-200 animate-slideLeft">
+        <div class="p-5 bg-[#172F61] text-white flex items-center justify-between">
+          <div>
+            <div class="text-xs text-blue-200 font-semibold">{{ currentWorkspace().examName }}</div>
+            <h3 class="text-base font-bold">ExamSphere AI Academic Mentor</h3>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="tutorLanguage.set(tutorLanguage() === 'English' ? 'Hindi' : 'English')"
+              class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white/15 hover:bg-white/25 cursor-pointer"
+            >
+              {{ tutorLanguage() }}
+            </button>
+            <button
+              type="button"
+              (click)="tutorOpen.set(false)"
+              class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm font-bold cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-5 space-y-3 bg-[#F8FAFF]">
+          <div class="text-[11px] font-semibold text-slate-500 bg-white px-3 py-2 rounded-xl border border-slate-200">
+            Active Topic: <span class="text-[#172F61] font-bold">{{ tutorTopic() }}</span>
+          </div>
+
+          @for (msg of tutorMessages(); track $index) {
+            <div
+              [class]="
+                msg.role === 'user'
+                  ? 'ml-8 p-3.5 rounded-2xl bg-[#315FEA] text-white text-xs leading-relaxed shadow-sm'
+                  : 'mr-6 p-3.5 rounded-2xl bg-white border border-slate-200 text-[#172F61] text-xs leading-relaxed shadow-xs'
+              "
+            >
+              {{ msg.text }}
+            </div>
+          }
+        </div>
+
+        <div class="p-4 bg-white border-t border-slate-200">
+          <div class="flex gap-2">
+            <input
+              type="text"
+              [value]="tutorQuestion()"
+              (input)="tutorQuestion.set($any($event.target).value)"
+              (keyup.enter)="sendTutorPrompt()"
+              placeholder="Ask a textbook concept, derivation or doubt..."
+              class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#315FEA]"
+            />
+            <button
+              type="button"
+              (click)="sendTutorPrompt()"
+              class="px-4 py-2.5 rounded-xl bg-[#315FEA] hover:bg-[#254EDB] text-white text-xs font-bold cursor-pointer"
+            >
+              Send
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

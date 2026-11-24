@@ -1,0 +1,391 @@
+<!-- Hide widget if student is already on the dedicated full-screen /ai-mentor page -->
+@if (!isOnAiMentorPage()) {
+  <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
+
+    <!-- Slide-Up Floating Chat Window -->
+    @if (isOpen()) {
+      <div class="w-[94vw] sm:w-[420px] h-[580px] max-h-[86vh] bg-white rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden mb-3.5 animate-fade-in-up">
+
+        <!-- Widget Header -->
+        <header class="bg-gradient-to-r from-[#172F61] via-[#1e3a78] to-[#315FEA] text-white px-4 py-3 flex items-center justify-between shrink-0 shadow-sm">
+          <div class="flex items-center gap-2.5">
+            <div class="relative w-8 h-8 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center font-black text-xs text-white border border-white/20 shadow-xs">
+              AI
+              <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border border-white animate-pulse"></span>
+            </div>
+            <div class="leading-tight">
+              <h3 class="text-xs font-black tracking-tight flex items-center gap-1.5">
+                <span>ExamSphere AI</span>
+                <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded-full bg-blue-500/30 text-blue-100 border border-blue-400/30">
+                  v2.0
+                </span>
+              </h3>
+              <span class="text-[10px] text-emerald-300 font-medium flex items-center gap-1 mt-0.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Online & Ready to Help
+              </span>
+            </div>
+          </div>
+
+          <!-- Header Actions -->
+          <div class="flex items-center gap-1">
+            <!-- Clear Chat Button -->
+            <button
+              type="button"
+              (click)="clearChat()"
+              class="p-1.5 text-blue-200 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+              title="Start New Chat Session"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+
+            <!-- Fullscreen / Dedicated Page Link -->
+            <a
+              routerLink="/ai-mentor"
+              (click)="isOpen.set(false)"
+              class="p-1.5 text-blue-200 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+              title="Expand to Fullscreen AI Mentor Studio"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+            </a>
+
+            <!-- Minimize Widget Button -->
+            <button
+              type="button"
+              (click)="toggleOpen()"
+              class="p-1.5 text-blue-200 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+              title="Minimize Chat"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Mode Selector Mini Pills Strip -->
+        <div class="bg-slate-50 border-b border-slate-200/80 px-3 py-1.5 flex items-center gap-1.5 overflow-x-auto scrollbar-none shrink-0">
+          @for (m of modes; track m.id) {
+            <button
+              type="button"
+              (click)="setMode(m.id)"
+              class="px-2.5 py-1 rounded-full text-[10px] font-bold cursor-pointer whitespace-nowrap transition-all flex items-center gap-1"
+              [class.bg-[#172F61]]="activeMode() === m.id"
+              [class.text-white]="activeMode() === m.id"
+              [class.shadow-2xs]="activeMode() === m.id"
+              [class.bg-white]="activeMode() !== m.id"
+              [class.text-slate-600]="activeMode() !== m.id"
+              [class.border]="activeMode() !== m.id"
+              [class.border-slate-200]="activeMode() !== m.id"
+              [class.hover:border-blue-300]="activeMode() !== m.id"
+              [title]="m.tooltip"
+            >
+              <span>{{ m.icon }}</span>
+              <span>{{ m.label }}</span>
+            </button>
+          }
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div #widgetScrollContainer class="flex-1 overflow-y-auto p-3.5 space-y-3.5 bg-slate-50/70">
+          
+          <!-- Welcome / Starter Prompt Box when messages are few -->
+          @if (messages().length === 1) {
+            <div class="p-3.5 rounded-2xl bg-gradient-to-br from-blue-50/80 via-indigo-50/50 to-white border border-blue-100/90 shadow-2xs space-y-2.5">
+              <div class="flex items-center gap-2">
+                <span class="text-base">🚀</span>
+                <span class="text-xs font-black text-[#172F61]">Instant Exam Question Solver</span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-relaxed">
+                Choose a high-yield question below or type your concept doubt, equation derivation, or practice MCQ request:
+              </p>
+              <div class="space-y-1.5 pt-1">
+                @for (q of quickQuestions; track q.text) {
+                  <button
+                    type="button"
+                    (click)="selectPrompt(q.text)"
+                    class="w-full text-left p-2 rounded-xl bg-white hover:bg-blue-50/90 border border-slate-200/80 hover:border-blue-300 text-[11px] font-semibold text-slate-700 hover:text-blue-700 transition flex items-center gap-2 cursor-pointer shadow-2xs group"
+                  >
+                    <span class="shrink-0 text-xs">{{ q.icon }}</span>
+                    <span class="truncate flex-1">{{ q.text }}</span>
+                    <span class="text-slate-300 group-hover:text-blue-500 font-bold text-xs shrink-0">→</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Message Loop -->
+          @for (msg of messages(); track msg.id) {
+            @if (msg.role === 'user') {
+              <!-- User Message -->
+              <div class="flex justify-end">
+                <div class="max-w-[85%] bg-[#315FEA] text-white rounded-2xl rounded-tr-xs px-3.5 py-2.5 text-xs shadow-xs leading-relaxed">
+                  <p class="whitespace-pre-wrap">{{ msg.content }}</p>
+                  <span class="block text-[9px] text-blue-200 text-right mt-1 opacity-80">
+                    {{ msg.createdAt | date:'shortTime' }}
+                  </span>
+                </div>
+              </div>
+            } @else {
+              <!-- Assistant Message -->
+              <div class="flex items-start gap-2 max-w-[94%]">
+                <div class="w-7 h-7 rounded-xl bg-[#172F61] text-white flex items-center justify-center font-black text-[10px] shrink-0 mt-0.5 shadow-2xs">
+                  AI
+                </div>
+                <div class="bg-white border border-slate-200/90 rounded-2xl rounded-tl-xs p-3 text-xs text-slate-800 shadow-xs space-y-2 flex-1">
+                  
+                  <!-- AI Message Top Tool Strip -->
+                  <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[10px] font-black text-[#172F61]">ExamSphere AI</span>
+                      <span class="text-[9px] px-1.5 py-0.2 rounded font-bold uppercase bg-blue-50 text-blue-700 border border-blue-100">
+                        {{ msg.mode || activeMode() }}
+                      </span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                      <!-- Copy Button -->
+                      <button
+                        type="button"
+                        (click)="copyMessage(msg)"
+                        class="text-[10px] text-slate-400 hover:text-slate-700 font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                        title="Copy Response"
+                      >
+                        @if (copiedMessageId() === msg.id) {
+                          <span class="text-emerald-600 font-bold">✓ Copied</span>
+                        } @else {
+                          <span>Copy</span>
+                        }
+                      </button>
+
+                      <!-- Listen / Text-to-Speech -->
+                      <button
+                        type="button"
+                        (click)="speakText(msg)"
+                        class="text-[10px] text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                        title="Listen to Explanation"
+                      >
+                        <span>🔊</span>
+                        <span>{{ isSpeaking() && activeSpeakingMessageId() === msg.id ? 'Stop' : 'Listen' }}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Formatted Answer Content -->
+                  <div class="leading-relaxed prose-sm" [innerHTML]="formatMarkdown(msg.content)"></div>
+
+                  <!-- Interactive MCQs if returned -->
+                  @if (msg.mcqs && msg.mcqs.length > 0) {
+                    <div class="space-y-2.5 pt-2 border-t border-slate-100">
+                      <div class="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                        🎯 Interactive Practice Quiz
+                      </div>
+
+                      @for (mcq of msg.mcqs; track mcq.question; let qIdx = $index) {
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+                          <p class="font-bold text-[11px] text-slate-900 leading-snug">
+                            Q{{ qIdx + 1 }}. {{ mcq.question }}
+                          </p>
+
+                          <div class="grid grid-cols-1 gap-1.5">
+                            @for (opt of mcq.options; track opt; let optIdx = $index) {
+                              <button
+                                type="button"
+                                (click)="selectMCQOption(msg.id + '-' + qIdx, optIdx)"
+                                class="p-2 rounded-lg text-[10px] text-left font-medium border flex items-center gap-2 cursor-pointer transition-all"
+                                [class.bg-emerald-50]="mcqUserAnswers()[msg.id + '-' + qIdx] === optIdx && optIdx === mcq.correctIndex"
+                                [class.border-emerald-500]="mcqUserAnswers()[msg.id + '-' + qIdx] === optIdx && optIdx === mcq.correctIndex"
+                                [class.text-emerald-900]="mcqUserAnswers()[msg.id + '-' + qIdx] === optIdx && optIdx === mcq.correctIndex"
+                                [class.bg-rose-50]="mcqUserAnswers()[msg.id + '-' + qIdx] === optIdx && optIdx !== mcq.correctIndex"
+                                [class.border-rose-400]="mcqUserAnswers()[msg.id + '-' + qIdx] === optIdx && optIdx !== mcq.correctIndex"
+                                [class.text-rose-900]="mcqUserAnswers()[msg.id + '-' + qIdx] === optIdx && optIdx !== mcq.correctIndex"
+                                [class.bg-white]="mcqUserAnswers()[msg.id + '-' + qIdx] !== optIdx"
+                                [class.border-slate-200]="mcqUserAnswers()[msg.id + '-' + qIdx] !== optIdx"
+                                [class.hover:border-blue-300]="mcqUserAnswers()[msg.id + '-' + qIdx] !== optIdx"
+                              >
+                                <span
+                                  class="w-4 h-4 rounded-md bg-slate-100 flex items-center justify-center font-bold text-[9px] shrink-0"
+                                  [class.bg-emerald-200]="mcqUserAnswers()[msg.id + '-' + qIdx] === optIdx && optIdx === mcq.correctIndex"
+                                  [class.bg-rose-200]="mcqUserAnswers()[msg.id + '-' + qIdx] === optIdx && optIdx !== mcq.correctIndex"
+                                >
+                                  {{ ['A','B','C','D'][optIdx] }}
+                                </span>
+                                <span class="flex-1">{{ opt }}</span>
+                                @if (mcqUserAnswers()[msg.id + '-' + qIdx] === optIdx) {
+                                  <span class="text-xs font-black">
+                                    {{ optIdx === mcq.correctIndex ? '✓' : '✕' }}
+                                  </span>
+                                }
+                              </button>
+                            }
+                          </div>
+
+                          @if (mcqUserAnswers()[msg.id + '-' + qIdx] !== undefined) {
+                            <div class="mt-2 p-2 rounded-lg bg-blue-50/70 border border-blue-200/80 text-[10px] text-blue-900 leading-relaxed">
+                              <span class="font-bold">Explanation:</span> {{ mcq.explanation }}
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <!-- Interactive Flashcards if returned -->
+                  @if (msg.flashcards && msg.flashcards.length > 0) {
+                    <div class="space-y-2 pt-2 border-t border-slate-100">
+                      <div class="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                        ⚡ Quick Memory Flashcards
+                      </div>
+
+                      @for (card of msg.flashcards; track card.front; let cIdx = $index) {
+                        <div
+                          (click)="toggleFlashcard(msg.id + '-' + cIdx)"
+                          class="p-2.5 rounded-xl border border-slate-200 bg-white hover:border-blue-300 transition-all cursor-pointer shadow-2xs"
+                        >
+                          <div class="flex items-center justify-between text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                            <span>{{ flippedCards()[msg.id + '-' + cIdx] ? 'Answer / Concept' : 'Question / Formula' }}</span>
+                            <span class="text-blue-600">Click to Flip 🔄</span>
+                          </div>
+                          <p class="text-[11px] font-bold text-slate-800 leading-snug">
+                            {{ flippedCards()[msg.id + '-' + cIdx] ? card.back : card.front }}
+                          </p>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <!-- Suggested Follow-up Questions -->
+                  @if (msg.suggestedPrompts && msg.suggestedPrompts.length > 0) {
+                    <div class="pt-2 border-t border-slate-100 space-y-1.5">
+                      <span class="text-[9px] font-bold uppercase text-slate-400 tracking-wider">Suggested Next:</span>
+                      <div class="flex flex-wrap gap-1.5">
+                        @for (sp of msg.suggestedPrompts; track sp) {
+                          <button
+                            type="button"
+                            (click)="selectPrompt(sp)"
+                            class="px-2 py-1 rounded-lg text-[10px] font-medium bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/70 transition cursor-pointer"
+                          >
+                            {{ sp }} →
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                </div>
+              </div>
+            }
+          }
+
+          <!-- Thinking / Loading Indicator -->
+          @if (isLoading()) {
+            <div class="flex items-start gap-2 max-w-[85%]">
+              <div class="w-7 h-7 rounded-xl bg-[#172F61] text-white flex items-center justify-center font-black text-[10px] shrink-0 mt-0.5">
+                AI
+              </div>
+              <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-xs p-3 shadow-xs flex items-center gap-2 text-xs text-slate-600">
+                <div class="flex gap-1">
+                  <span class="w-2 h-2 rounded-full bg-blue-600 animate-bounce"></span>
+                  <span class="w-2 h-2 rounded-full bg-indigo-600 animate-bounce" style="animation-delay: 0.15s"></span>
+                  <span class="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style="animation-delay: 0.3s"></span>
+                </div>
+                <span class="font-semibold text-[11px] ml-1">Analyzing syllabus & preparing explanation...</span>
+              </div>
+            </div>
+          }
+
+        </div>
+
+        <!-- Input Console Bar -->
+        <footer class="p-3 bg-white border-t border-slate-200 shrink-0 space-y-1.5">
+          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-300 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-500/20 rounded-2xl p-1.5 transition-all">
+            
+            <!-- Voice Input Mic -->
+            <button
+              type="button"
+              (click)="toggleVoiceInput()"
+              class="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-white transition-all cursor-pointer shrink-0"
+              [class.bg-rose-100]="isVoiceRecording()"
+              [class.text-rose-600]="isVoiceRecording()"
+              [class.animate-pulse]="isVoiceRecording()"
+              title="Speak your doubt via microphone"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+            </button>
+
+            <!-- Text Input -->
+            <input
+              type="text"
+              [ngModel]="currentInput()"
+              (ngModelChange)="currentInput.set($event)"
+              (keydown.enter)="sendMessage()"
+              placeholder="Ask any concept, formula, or exam question..."
+              class="w-full bg-transparent text-xs text-slate-800 placeholder-slate-400 focus:outline-none px-1"
+            />
+
+            <!-- Send Button -->
+            <button
+              type="button"
+              (click)="sendMessage()"
+              [disabled]="!currentInput().trim() || isLoading()"
+              class="p-2 rounded-xl font-bold transition-all cursor-pointer shrink-0 shadow-xs flex items-center justify-center"
+              [class.bg-[#315FEA]]="currentInput().trim() && !isLoading()"
+              [class.text-white]="currentInput().trim() && !isLoading()"
+              [class.hover:bg-blue-700]="currentInput().trim() && !isLoading()"
+              [class.bg-slate-200]="!currentInput().trim() || isLoading()"
+              [class.text-slate-400]="!currentInput().trim() || isLoading()"
+              [class.cursor-not-allowed]="!currentInput().trim() || isLoading()"
+              title="Send Question (Enter)"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between px-1 text-[9px] text-slate-400">
+            <span>ExamSphere AI Virtual Tutor</span>
+            <span class="hover:underline cursor-pointer" (click)="clearChat()">Reset Chat</span>
+          </div>
+        </footer>
+
+      </div>
+    }
+
+    <!-- Floating Trigger Launcher Button -->
+    <button
+      type="button"
+      (click)="toggleOpen()"
+      class="group flex items-center gap-3 px-4 py-3 rounded-full bg-gradient-to-r from-[#172F61] via-[#1E3A78] to-[#315FEA] text-white shadow-xl shadow-blue-600/30 hover:shadow-blue-600/50 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer border border-white/20"
+      aria-label="Toggle AI Examination Mentor Chatbot"
+    >
+      @if (isOpen()) {
+        <!-- Close Icon when open -->
+        <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </div>
+        <span class="text-xs font-black tracking-tight">Close Mentor</span>
+      } @else {
+        <!-- AI Icon with pulsating dot -->
+        <div class="relative w-7 h-7 rounded-full bg-white/20 flex items-center justify-center font-black text-xs text-white">
+          AI
+          <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white animate-pulse"></span>
+        </div>
+        <div class="text-left hidden sm:block">
+          <span class="block text-xs font-black tracking-tight leading-tight">AI Exam Mentor</span>
+          <span class="block text-[9px] text-blue-200 leading-tight">24/7 Virtual Doubt Tutor</span>
+        </div>
+      }
+    </button>
+
+  </div>
+}

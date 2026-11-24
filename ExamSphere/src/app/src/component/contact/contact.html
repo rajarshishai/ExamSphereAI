@@ -1,0 +1,263 @@
+<div class="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-indigo-500 selection:text-white">
+  
+ 
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-b from-indigo-950 via-indigo-900 to-slate-900 text-white py-24 px-6 text-center relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    <div class="max-w-3xl mx-auto space-y-4 relative z-10">
+      <span class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-indigo-500/15 text-indigo-300 text-xs font-semibold uppercase tracking-wider border border-indigo-500/30 shadow-inner">
+        <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+        <span>24/7 Student Assistance</span>
+      </span>
+      <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-tight">
+        Let's Make Your Exam Journey Easier.
+      </h1>
+      <p class="text-slate-300 text-lg max-w-2xl mx-auto font-normal">
+        Questions about syllabus corrections, AI tutor responses, or mock test errors? Our dedicated academic & technical team is here to guide you forward.
+      </p>
+    </div>
+  </section>
+
+  <!-- Contact Information Cards -->
+  <section class="max-w-7xl mx-auto px-6 -mt-12 relative z-20 grid grid-cols-1 md:grid-cols-4 gap-6">
+    
+    <div class="bg-white p-6 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col justify-between hover:-translate-y-1.5 transition duration-300 group">
+      <div>
+        <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-5 font-bold text-xl group-hover:bg-indigo-600 group-hover:text-white transition shadow-sm">✉</div>
+        <h3 class="font-bold text-slate-900 text-lg mb-1">Email Support</h3>
+        <p class="text-sm text-slate-500 mb-6 leading-relaxed">General inquiries and subscription management.</p>
+      </div>
+      <a href="mailto:support@examsphere.ai" class="text-indigo-600 text-sm font-bold hover:underline flex items-center space-x-1">
+        <span>support@examsphere.ai</span>
+      </a>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col justify-between hover:-translate-y-1.5 transition duration-300 group">
+      <div>
+        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-5 font-bold text-xl group-hover:bg-blue-600 group-hover:text-white transition shadow-sm">🎓</div>
+        <h3 class="font-bold text-slate-900 text-lg mb-1">Student Helpdesk</h3>
+        <p class="text-sm text-slate-500 mb-6 leading-relaxed">Syllabus updates & PYQ clarification.</p>
+      </div>
+      <span class="text-slate-900 text-sm font-semibold flex items-center space-x-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span>Online (Mon-Sat)</span>
+      </span>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col justify-between hover:-translate-y-1.5 transition duration-300 group">
+      <div>
+        <div class="w-12 h-12 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center mb-5 font-bold text-xl group-hover:bg-violet-600 group-hover:text-white transition shadow-sm">⚙</div>
+        <h3 class="font-bold text-slate-900 text-lg mb-1">Technical Support</h3>
+        <p class="text-sm text-slate-500 mb-6 leading-relaxed">Platform glitches & AI tutoring bugs.</p>
+      </div>
+      <a href="#contact-form-section" class="text-violet-600 text-sm font-bold hover:underline">Raise a Ticket →</a>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col justify-between hover:-translate-y-1.5 transition duration-300 group">
+      <div>
+        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-5 font-bold text-xl group-hover:bg-emerald-600 group-hover:text-white transition shadow-sm">💡</div>
+        <h3 class="font-bold text-slate-900 text-lg mb-1">New Exam Request</h3>
+        <p class="text-sm text-slate-500 mb-6 leading-relaxed">Suggest new competitive examinations to add.</p>
+      </div>
+      <a href="#contact-form-section" class="text-emerald-600 text-sm font-bold hover:underline">Suggest Exam →</a>
+    </div>
+
+  </section>
+
+  <!-- Main Grid: Form & Tracker -->
+  <section id="contact-form-section" class="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+    
+    <!-- Contact Form Column (2 Cols) -->
+    <div class="lg:col-span-2 bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-8 md:p-12">
+      
+      <div class="mb-8">
+        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Send Us a Message</h2>
+        <p class="text-slate-500 text-sm mt-2">Complete the form below to submit a formal ticket directly to our response queue.</p>
+      </div>
+
+      <!-- Success Card State -->
+      <div *ngIf="successMessage" class="p-8 bg-emerald-50/80 backdrop-blur border border-emerald-200 rounded-3xl text-emerald-900 space-y-4 animate-fadeIn">
+        <div class="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg shadow-emerald-600/30">✓</div>
+        <div>
+          <h3 class="text-xl font-bold mb-1">Ticket Submitted Successfully!</h3>
+          <p class="text-sm text-emerald-700 leading-relaxed">
+            Your unique support tracking ID is <span class="font-mono bg-emerald-200/70 px-2.5 py-1 rounded-lg font-black text-emerald-950">{{ generatedTicketId }}</span>. Use this ID in the sidebar tracker to follow updates.
+          </p>
+        </div>
+        <button (click)="resetContactForm()" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-md transition">
+          Submit Another Request
+        </button>
+      </div>
+
+      <!-- Main Reactive Form -->
+      <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="space-y-6" *ngIf="!successMessage">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Full Name -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Full Name *</label>
+            <input type="text" formControlName="fullName" placeholder="e.g. Alex Turner" 
+              class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none transition text-sm font-medium">
+            <div *ngIf="contactForm.get('fullName')?.touched && contactForm.get('fullName')?.invalid" class="text-rose-500 text-xs mt-1.5 font-medium">
+              Please enter your full name (min 2 characters).
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Email Address *</label>
+            <input type="email" formControlName="email" placeholder="student@university.com" 
+              class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none transition text-sm font-medium">
+            <div *ngIf="contactForm.get('email')?.touched && contactForm.get('email')?.invalid" class="text-rose-500 text-xs mt-1.5 font-medium">
+              Please provide a valid email address.
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Exam Name -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Target Examination *</label>
+            <select formControlName="examName" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none transition text-sm font-medium">
+              <option value="" disabled>Select target exam</option>
+              <option *ngFor="let exam of examsList" [value]="exam">{{ exam }}</option>
+            </select>
+            <div *ngIf="contactForm.get('examName')?.touched && contactForm.get('examName')?.invalid" class="text-rose-500 text-xs mt-1.5 font-medium">
+              Please select your target exam.
+            </div>
+          </div>
+
+          <!-- Query Category -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Query Category *</label>
+            <select formControlName="category" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none transition text-sm font-medium">
+              <option value="" disabled>Select query type</option>
+              <option *ngFor="let cat of queryCategories" [value]="cat">{{ cat }}</option>
+            </select>
+            <div *ngIf="contactForm.get('category')?.touched && contactForm.get('category')?.invalid" class="text-rose-500 text-xs mt-1.5 font-medium">
+              Please choose a query category.
+            </div>
+          </div>
+        </div>
+
+        <!-- Subject -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Subject *</label>
+          <input type="text" formControlName="subject" placeholder="e.g. Incorrect answer flag in GATE CS Mock Test #3" 
+            class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none transition text-sm font-medium">
+          <div *ngIf="contactForm.get('subject')?.touched && contactForm.get('subject')?.invalid" class="text-rose-500 text-xs mt-1.5 font-medium">
+            Subject is required (at least 5 characters).
+          </div>
+        </div>
+
+        <!-- Message -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Detailed Message *</label>
+          <textarea formControlName="message" rows="5" placeholder="Provide specific question numbers, error descriptions, or syllabus context..." 
+            class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none transition text-sm font-medium"></textarea>
+          <div *ngIf="contactForm.get('message')?.touched && contactForm.get('message')?.invalid" class="text-rose-500 text-xs mt-1.5 font-medium">
+            Please enter at least 10 characters detailing your issue.
+          </div>
+        </div>
+
+        <!-- Submit Action -->
+        <button type="submit" [disabled]="isSubmitting"
+          class="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold shadow-xl shadow-indigo-600/25 transition flex items-center justify-center space-x-2 disabled:opacity-50">
+          <span *ngIf="isSubmitting" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          <span>{{ isSubmitting ? 'Encrypting & Dispatching Ticket...' : 'Submit Support Ticket →' }}</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Sidebar: Ticket Tracker & AI Callout -->
+    <div class="space-y-8">
+      
+      <!-- Ticket Tracker Widget -->
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-8">
+        <h3 class="text-xl font-extrabold text-slate-900 mb-2">Track Your Ticket</h3>
+        <p class="text-sm text-slate-500 mb-6 leading-relaxed">Have an active ticket ID? Enter it below to check current resolution progress.</p>
+        
+        <form [formGroup]="trackForm" (ngSubmit)="onTrackTicket()" class="space-y-4">
+          <div>
+            <input type="text" formControlName="ticketIdInput" placeholder="e.g. ESAI-2026-4819" 
+              class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none uppercase font-mono text-sm tracking-wider font-bold">
+          </div>
+          <button type="submit" class="w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm shadow-md transition">
+            Check Status
+          </button>
+        </form>
+
+        <!-- Track Error State -->
+        <div *ngIf="trackError" class="mt-4 p-4 bg-rose-50 text-rose-700 text-xs font-semibold rounded-2xl border border-rose-100 flex items-center space-x-2">
+          <span>⚠️</span>
+          <span>{{ trackError }}</span>
+        </div>
+
+        <!-- Track Result Card -->
+        <div *ngIf="trackedTicket" class="mt-6 p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-sm animate-fadeIn">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+            <span class="font-mono font-black text-indigo-600">{{ trackedTicket.ticketId }}</span>
+            <span class="px-3 py-1 rounded-full text-xs font-bold tracking-wide"
+              [ngClass]="{
+                'bg-amber-100 text-amber-800': trackedTicket.status === 'Pending',
+                'bg-blue-100 text-blue-800': trackedTicket.status === 'In Progress',
+                'bg-emerald-100 text-emerald-800': trackedTicket.status === 'Resolved'
+              }">
+              {{ trackedTicket.status }}
+            </span>
+          </div>
+          <div class="text-xs text-slate-600 space-y-1.5 font-medium">
+            <p><strong class="text-slate-700">Aspirant:</strong> {{ trackedTicket.name }}</p>
+            <p><strong class="text-slate-700">Exam:</strong> {{ trackedTicket.examName }}</p>
+            <p><strong class="text-slate-700">Category:</strong> {{ trackedTicket.category }}</p>
+            <p><strong class="text-slate-700">Subject:</strong> {{ trackedTicket.subject }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Assistant Teaser Card -->
+      <div class="bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+        <h4 class="font-black text-xl mb-3 flex items-center space-x-2">
+          <span>🤖</span>
+          <span>ExamSphere AI Assistant</span>
+        </h4>
+        <p class="text-xs text-indigo-200 mb-6 leading-relaxed font-normal">
+          Instant answers to syllabus requirements, automated explanations, and tailored doubt clearing are already available in your active learning dashboard.
+        </p>
+        <a href="#" class="inline-flex items-center space-x-2 text-xs font-bold bg-white text-indigo-950 px-5 py-3 rounded-xl hover:bg-indigo-50 transition shadow-lg">
+          <span>Launch AI Tutor Hub</span>
+          <span>→</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FAQ Accordion Section -->
+  <section class="max-w-4xl mx-auto px-6 py-20 border-t border-slate-200/80">
+    <div class="text-center mb-14 space-y-3">
+      <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full">Common Inquiries</span>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Frequently Asked Questions</h2>
+      <p class="text-slate-500 text-sm max-w-lg mx-auto">Quick answers regarding mock tests, AI explanations, and account controls.</p>
+    </div>
+
+    <div class="space-y-4">
+      <div *ngFor="let faq of faqs; let i = index" class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm transition hover:border-slate-300">
+        <button (click)="toggleFaq(i)" class="w-full px-6 py-5 text-left font-bold text-slate-900 flex justify-between items-center hover:bg-slate-50/50 transition">
+          <span class="text-base pr-4">{{ faq.question }}</span>
+          <span class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center transform transition duration-300 text-indigo-600 font-bold shrink-0" [ngClass]="{'rotate-180 bg-indigo-50': faq.isOpen}">
+            ↓
+          </span>
+        </button>
+        <div *ngIf="faq.isOpen" class="px-6 pb-6 text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-4 bg-slate-50/40 animate-fadeIn">
+          {{ faq.answer }}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+
+</div>

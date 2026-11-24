@@ -1,0 +1,14 @@
+/* Syllabus Explorer Component Styles */
+:host {
+  display: block;
+}
+
+input[type="checkbox"] {
+  accent-color: #315FEA;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #315FEA;
+  outline-offset: 2px;
+}

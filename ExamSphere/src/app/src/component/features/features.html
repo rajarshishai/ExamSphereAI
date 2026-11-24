@@ -1,0 +1,160 @@
+<div class="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-blue-600 selection:text-white">
+
+  <!-- Hero Header -->
+  <header class="bg-gradient-to-b from-[#172F61] via-[#0F1E42] to-slate-900 text-white py-20 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#60a5fa_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    <div class="max-w-4xl mx-auto space-y-4 relative z-10">
+      <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-400/30">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        Unified Examination Preparation Ecosystem
+      </span>
+      <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
+        Everything You Need to Rank Higher in Competitive Exams.
+      </h1>
+      <p class="text-slate-300 text-sm sm:text-lg max-w-2xl mx-auto font-normal">
+        From universal exam intelligence to adaptive AI tutoring, dynamic study timetables, and verified mock tests—experience a connected preparation ecosystem.
+      </p>
+    </div>
+  </header>
+
+  <!-- Category Filter Strip -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
+    <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200 p-3 sm:p-4 flex flex-wrap items-center justify-center gap-2">
+      @for (cat of categories; track cat) {
+        <button
+          type="button"
+          (click)="selectedCategory = cat"
+          [class]="
+            selectedCategory === cat
+              ? 'px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold bg-[#172F61] text-white shadow-md transition'
+              : 'px-4 py-2 rounded-2xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition'
+          "
+        >
+          {{ cat }} {{ cat !== 'All' ? 'Modules' : 'Features' }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Features Grid -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 space-y-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (f of filteredFeatures; track f.number) {
+        <div class="bg-white rounded-3xl border border-slate-200/90 hover:border-blue-300 shadow-sm hover:shadow-lg transition-all p-6 sm:p-7 flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="w-10 h-10 rounded-2xl {{ f.iconBg }} text-white font-extrabold text-sm flex items-center justify-center shadow-md">
+                {{ f.number }}
+              </span>
+              <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                {{ f.badge }}
+              </span>
+            </div>
+
+            <h3 class="text-xl font-bold text-[#172F61] group-hover:text-blue-600 transition-colors">
+              {{ f.title }}
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+              {{ f.description }}
+            </p>
+
+            <ul class="mt-4 space-y-2 pt-4 border-t border-slate-100">
+              @for (h of f.highlights; track h) {
+                <li class="flex items-center gap-2 text-xs text-slate-700 font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0"></span>
+                  <span>{{ h }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-100">
+            <a
+              [routerLink]="f.ctaLink"
+              class="w-full py-2.5 px-4 rounded-xl bg-slate-50 hover:bg-blue-50 text-[#172F61] hover:text-blue-600 font-bold text-xs flex items-center justify-between transition group-hover:bg-blue-600 group-hover:text-white"
+            >
+              <span>{{ f.ctaText }}</span>
+              <span>→</span>
+            </a>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Comparative Matrix Table -->
+    <section class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-sm space-y-6">
+      <div class="text-center max-w-2xl mx-auto">
+        <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Architectural Advantage</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-[#172F61] mt-1">
+          Why Aspirants Choose ExamSphere AI
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500 mt-2">
+          Compare the fragmented approach of generic websites against ExamSphere AI's connected intelligence system.
+        </p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm">
+          <thead>
+            <tr class="border-b border-slate-200 bg-slate-50 text-slate-700 font-bold uppercase text-[11px]">
+              <th class="p-4 rounded-l-xl">Preparation Dimension</th>
+              <th class="p-4 text-slate-500">Traditional Exam Websites</th>
+              <th class="p-4 bg-blue-50 text-blue-700 font-extrabold rounded-r-xl">ExamSphere AI Platform</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr>
+              <td class="p-4 font-bold text-slate-800">Syllabus Discovery</td>
+              <td class="p-4 text-slate-500">Static, unstructured PDF files scattered across different agency sites</td>
+              <td class="p-4 bg-blue-50/50 text-slate-800 font-medium">Interactive tree hierarchy with topic weightage, study hours, and checkoffs</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-slate-800">Doubt Resolution</td>
+              <td class="p-4 text-slate-500">Wait hours or days for volunteer replies on forum boards</td>
+              <td class="p-4 bg-blue-50/50 text-slate-800 font-medium">Instant 24/7 AI Mentor providing verified derivations and step-by-step logic</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-slate-800">Mock Assessments</td>
+              <td class="p-4 text-slate-500">Rigid generic test series with identical question sets for all users</td>
+              <td class="p-4 bg-blue-50/50 text-slate-800 font-medium">Dynamic AI mock test generator targeting student's specific weak topics</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-slate-800">Study Scheduling</td>
+              <td class="p-4 text-slate-500">Fixed PDF timetables that fail permanently if a student falls sick or misses a day</td>
+              <td class="p-4 bg-blue-50/50 text-slate-800 font-medium">Adaptive study planner that auto-rebalances pending modules before exam day</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-slate-800">Knowledge Retention</td>
+              <td class="p-4 text-slate-500">Passive re-reading of voluminous textbooks leading to rapid forgetting</td>
+              <td class="p-4 bg-blue-50/50 text-slate-800 font-medium">2-3-5-7 spaced-repetition flashcards and high-yield formula recall sheets</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Bottom CTA Card -->
+    <section class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 text-white rounded-3xl p-8 sm:p-12 text-center space-y-4 shadow-xl">
+      <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight">
+        Ready to Transform Your Examination Preparation?
+      </h2>
+      <p class="text-blue-100 text-sm sm:text-base max-w-xl mx-auto">
+        Join students mastering competitive examinations with personalized AI mentorship, adaptive mock tests, and smart syllabus tracking.
+      </p>
+      <div class="pt-4 flex flex-wrap justify-center gap-3">
+        <a
+          routerLink="/auth"
+          class="px-8 py-3.5 rounded-xl bg-white text-[#172F61] hover:bg-blue-50 font-extrabold text-sm shadow-md transition"
+        >
+          Get Started Free Now
+        </a>
+        <a
+          routerLink="/explore-exams"
+          class="px-8 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/25 transition"
+        >
+          Explore All Examinations
+        </a>
+      </div>
+    </section>
+  </main>
+</div>

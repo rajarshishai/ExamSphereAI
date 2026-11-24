@@ -1,0 +1,1385 @@
+<div class="min-h-screen bg-slate-50/70 pb-24 text-slate-800">
+
+  <!-- TOP TOAST NOTIFICATION -->
+  @if (toastMessage) {
+    <div class="fixed top-6 right-6 z-50 animate-in slide-in-from-top-3 duration-200">
+      <div class="flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl text-xs font-bold"
+           [ngClass]="toastType === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path *ngIf="toastType === 'success'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          <path *ngIf="toastType === 'error'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+        <span>{{ toastMessage }}</span>
+      </div>
+    </div>
+  }
+
+  <!-- ==================== WORKSPACE HERO BANNER ==================== -->
+  <section class="bg-gradient-to-r from-[#172F61] via-indigo-900 to-blue-900 text-white pt-8 pb-12 px-4 sm:px-6 lg:px-8 border-b border-indigo-950 relative overflow-hidden">
+    <!-- Ambient Background Glow -->
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+
+      <!-- Breadcrumbs & Quick Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 text-xs mb-4 text-blue-200 font-semibold">
+        <div class="flex items-center gap-2">
+          <a routerLink="/explore-exams" class="hover:text-white transition">Explore Exams</a>
+          <span>/</span>
+          <span class="text-white font-bold">{{ exam.shortName }} Workspace</span>
+        </div>
+
+        <!-- Advanced Tools: Multilingual + Focus Timer + Current Affairs -->
+        <div class="flex items-center gap-2">
+          <!-- Multilingual Selector -->
+          <div class="flex items-center bg-white/10 backdrop-blur-md rounded-xl p-1 border border-white/15 text-[11px] font-bold">
+            <button (click)="setLanguage('en')" class="px-2 py-0.5 rounded-lg transition" [ngClass]="selectedLanguage === 'en' ? 'bg-blue-600 text-white shadow-xs' : 'text-blue-200 hover:text-white'">EN</button>
+            <button (click)="setLanguage('hi')" class="px-2 py-0.5 rounded-lg transition" [ngClass]="selectedLanguage === 'hi' ? 'bg-blue-600 text-white shadow-xs' : 'text-blue-200 hover:text-white'">हिंदी</button>
+            <button (click)="setLanguage('bn')" class="px-2 py-0.5 rounded-lg transition" [ngClass]="selectedLanguage === 'bn' ? 'bg-blue-600 text-white shadow-xs' : 'text-blue-200 hover:text-white'">বাংলা</button>
+          </div>
+
+          <!-- Focus Mode Study Timer CTA -->
+          <button
+            type="button"
+            (click)="openFocusModal()"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/30 font-bold transition cursor-pointer"
+          >
+            <span>⏱️</span>
+            <span>Focus Mode</span>
+          </button>
+
+          <!-- Current Affairs Intelligence CTA -->
+          <button
+            type="button"
+            (click)="isCurrentAffairsOpen = true"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/15 font-bold transition cursor-pointer"
+          >
+            <span>📰</span>
+            <span class="hidden sm:inline">Current Affairs</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Workspace Identity -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pt-2">
+        <div class="space-y-2">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-blue-500/20 text-blue-300 border border-blue-400/30 uppercase tracking-wider">
+              {{ exam.category }}
+            </span>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-400/30">
+              ⏳ {{ exam.daysRemaining }} Days to Exam ({{ exam.examDateText }})
+            </span>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              {{ exam.preparationStatus }}
+            </span>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+              {{ exam.shortName }}
+            </h1>
+
+            <!-- Exam Switcher Dropdown Trigger -->
+            <div class="relative">
+              <button
+                type="button"
+                (click)="isExamSelectorOpen = !isExamSelectorOpen"
+                class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold border border-white/20 transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>Switch Exam</span>
+                <svg class="w-3.5 h-3.5 transition-transform" [class.rotate-180]="isExamSelectorOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+
+              <!-- Dropdown Menu -->
+              @if (isExamSelectorOpen) {
+                <div class="absolute left-0 mt-2 w-72 bg-white text-slate-800 rounded-2xl shadow-2xl border border-slate-100 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div class="p-2 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Switch Target Examination</div>
+                  @for (opt of examOptions; track opt.slug) {
+                    <button
+                      type="button"
+                      (click)="switchExam(opt.slug, opt.name, opt.category)"
+                      class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-blue-50 text-xs font-bold flex items-center justify-between transition cursor-pointer"
+                      [ngClass]="exam.slug === opt.slug ? 'bg-blue-50 text-blue-700' : 'text-slate-700'"
+                    >
+                      <span class="truncate">{{ opt.name }}</span>
+                      @if (exam.slug === opt.slug) {
+                        <span class="text-blue-600 font-black">✓</span>
+                      }
+                    </button>
+                  }
+                  <div class="pt-2 mt-1 border-t border-slate-100">
+                    <a routerLink="/explore-exams" class="block w-full text-center py-2 text-xs font-bold text-blue-600 hover:bg-blue-50 rounded-xl">
+                      Browse All 1,200+ Examinations →
+                    </a>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <p class="text-xs sm:text-sm text-blue-100/90 max-w-2xl leading-relaxed">
+            {{ exam.description }}
+          </p>
+        </div>
+
+        <!-- AI Exam Readiness Score Card -->
+        <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-5 rounded-3xl min-w-[280px] shadow-lg">
+          <div class="flex items-center justify-between text-xs font-bold text-blue-200 mb-2">
+            <span>AI Exam Readiness Score</span>
+            <span class="px-2 py-0.5 rounded-full bg-blue-500/30 text-white font-black text-[11px]">{{ exam.readinessScore }}/100</span>
+          </div>
+
+          <!-- Progress Meter -->
+          <div class="w-full h-3 rounded-full bg-white/20 overflow-hidden mb-2">
+            <div class="h-full bg-gradient-to-r from-amber-400 via-emerald-400 to-blue-400 rounded-full transition-all duration-700" [style.width.%]="exam.readinessScore"></div>
+          </div>
+
+          <div class="text-[11px] font-semibold text-emerald-300 flex items-center gap-1.5">
+            <span>🚀</span>
+            <span>{{ exam.readinessLabel }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== KEY PREPARATION METRICS ROW ==================== -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+      <!-- 1. Overall Preparation -->
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80">
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Overall Prep</div>
+        <div class="text-xl sm:text-2xl font-black text-slate-900">{{ exam.readinessScore }}%</div>
+        <div class="text-[10px] text-emerald-600 font-bold mt-0.5 truncate">{{ exam.readinessLabel }}</div>
+      </div>
+
+      <!-- 2. Syllabus Completion -->
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80">
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Syllabus Covered</div>
+        <div class="text-xl sm:text-2xl font-black text-blue-600">{{ exam.syllabusCompletion }}%</div>
+        <div class="text-[10px] text-slate-500 font-medium mt-0.5">{{ completedTopicsCount }} of {{ totalTopicsCount }} Topics Mastered</div>
+      </div>
+
+      <!-- 3. Mock Test Avg -->
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80">
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mock Average</div>
+        <div class="text-xl sm:text-2xl font-black text-indigo-600">{{ exam.mockTestAvg }} <span class="text-xs font-semibold text-slate-400">/ 100</span></div>
+        <div class="text-[10px] text-slate-500 font-medium mt-0.5">{{ totalMockTestsAttempted }} Tests • Accuracy: {{ exam.practiceAccuracy }}%</div>
+      </div>
+
+      <!-- 4. Questions Solved -->
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80">
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Questions Solved</div>
+        <div class="text-xl sm:text-2xl font-black text-purple-600">{{ exam.questionsSolvedCount }}</div>
+        <div class="text-[10px] text-purple-600 font-bold mt-0.5">{{ exam.correctQuestionsCount || 0 }} Correct • Daily Practice & Drills</div>
+      </div>
+
+      <!-- 5. Active Streak -->
+      <div class="bg-gradient-to-br from-amber-500 to-orange-500 p-4 rounded-2xl text-white shadow-md shadow-amber-200 col-span-2 sm:col-span-1">
+        <div class="text-[10px] font-bold text-amber-100 uppercase tracking-wider mb-1">Daily Study Streak</div>
+        <div class="text-xl sm:text-2xl font-black flex items-center gap-1.5">
+          {{ exam.studyStreakDays }} Days 🔥
+        </div>
+        <div class="text-[10px] text-amber-100 font-bold mt-0.5">{{ exam.totalStudyHours }} hrs logged</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 20 CORE MODULES HUB & TAB SELECTOR ==================== -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm mb-8">
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 mb-6">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-[#172F61]">
+            All 20 Preparation Modules for {{ exam.shortName }}
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">
+            Access the complete ecosystem: syllabus exploration, mock tests, smart revision, AI evaluation, and peer community.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="setTab('dashboard')"
+          class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2"
+          [ngClass]="activeTab === 'dashboard' ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
+        >
+          <span>🏠</span>
+          <span>Workspace Overview</span>
+        </button>
+      </div>
+
+      <!-- Category Pill Modules Grid (Quick Launcher) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+
+        <!-- Category 1: Learn & Understand -->
+        <div class="p-4 rounded-2xl bg-blue-50/60 border border-blue-100 space-y-2">
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-blue-800 flex items-center gap-1.5">
+            <span>📖</span> Learn & Understand
+          </div>
+          <div class="space-y-1">
+            <button (click)="setTab('syllabus')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'syllabus' ? 'bg-blue-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>1. Syllabus Explorer</span>
+              <span class="text-[10px] opacity-75">{{ exam.syllabusCompletion }}%</span>
+            </button>
+            <button (click)="setTab('ai-tutor')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'ai-tutor' ? 'bg-blue-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>2. AI Personal Tutor</span>
+              <span class="text-[10px] px-1 rounded bg-emerald-200 text-emerald-900 font-extrabold">24/7</span>
+            </button>
+            <button (click)="setTab('materials')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'materials' ? 'bg-blue-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>3. Study Materials & Notes</span>
+              <span class="text-[10px] opacity-75">4 PDFs</span>
+            </button>
+            <button (click)="setTab('videos')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'videos' ? 'bg-blue-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>4. Video Learning Resources</span>
+              <span class="text-[10px] opacity-75">Marathon</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category 2: Practice & Test -->
+        <div class="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 space-y-2">
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-800 flex items-center gap-1.5">
+            <span>🎯</span> Practice & Test
+          </div>
+          <div class="space-y-1">
+            <button (click)="setTab('mock-tests')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'mock-tests' ? 'bg-indigo-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>5. Mock Test Center</span>
+              <span class="text-[10px] opacity-75">{{ totalMockTestsAttempted }} Taken</span>
+            </button>
+            <button (click)="setTab('pyqs')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'pyqs' ? 'bg-indigo-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>6. Previous Year Questions</span>
+              <span class="text-[10px] opacity-75">2018-24</span>
+            </button>
+            <button (click)="setTab('daily-practice')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'daily-practice' ? 'bg-indigo-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>7. Daily Practice Qs</span>
+              <span class="text-[10px] px-1 rounded bg-amber-200 text-amber-900 font-extrabold">{{ answeredDailyCount }}/5 Today</span>
+            </button>
+            <button (click)="setTab('topic-arena')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'topic-arena' ? 'bg-indigo-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>8. Topic Practice Arena</span>
+              <span class="text-[10px] opacity-75">Drills</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category 3: AI-Powered Preparation -->
+        <div class="p-4 rounded-2xl bg-purple-50/60 border border-purple-100 space-y-2">
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-purple-800 flex items-center gap-1.5">
+            <span>🤖</span> AI Preparation
+          </div>
+          <div class="space-y-1">
+            <button (click)="setTab('planner')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'planner' ? 'bg-purple-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>9. AI Study Planner</span>
+              <span class="text-[10px] opacity-75">Active</span>
+            </button>
+            <button (click)="setTab('analytics')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'analytics' ? 'bg-purple-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>10. AI Analytics</span>
+              <span class="text-[10px] opacity-75">Metrics</span>
+            </button>
+            <button (click)="setTab('recommendations')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'recommendations' ? 'bg-purple-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>11. Smart Qs Recs</span>
+              <span class="text-[10px] opacity-75">Targets</span>
+            </button>
+            <button (click)="setTab('answer-eval')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'answer-eval' ? 'bg-purple-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>12. AI Answer Eval</span>
+              <span class="text-[10px] opacity-75">Rubric</span>
+            </button>
+            <button (click)="setTab('revision')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'revision' ? 'bg-purple-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>13. Smart Revision</span>
+              <span class="text-[10px] opacity-75">Spaced</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category 4: Track & Improve -->
+        <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100 space-y-2">
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+            <span>📈</span> Track & Improve
+          </div>
+          <div class="space-y-1">
+            <button (click)="setTab('progress-tracker')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'progress-tracker' ? 'bg-emerald-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>14. Progress Tracker</span>
+              <span class="text-[10px] opacity-75">Milestones</span>
+            </button>
+            <button (click)="setTab('leaderboard')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'leaderboard' ? 'bg-emerald-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>15. All India Leaderboard</span>
+              <span class="text-[10px] font-extrabold text-amber-600">Rank #{{ currentUserRank }}</span>
+            </button>
+            <button (click)="setTab('achievements')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'achievements' ? 'bg-emerald-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>16. Streak & Badges</span>
+              <span class="text-[10px] opacity-75">{{ unlockedBadgesCount }} Badges</span>
+            </button>
+            <button (click)="setTab('weakness')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'weakness' ? 'bg-emerald-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>17. Weakness Detection</span>
+              <span class="text-[10px] px-1 rounded bg-rose-100 text-rose-700 font-bold">3 Areas</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category 5: Info & Community -->
+        <div class="p-4 rounded-2xl bg-amber-50/60 border border-amber-100 space-y-2">
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+            <span>🌐</span> Info & Community
+          </div>
+          <div class="space-y-1">
+            <button (click)="setTab('updates')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'updates' ? 'bg-amber-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>18. Exam Notifications</span>
+              <span class="text-[10px] opacity-75">Official</span>
+            </button>
+            <button (click)="setTab('forum')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'forum' ? 'bg-amber-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>19. Discussion Forum</span>
+              <span class="text-[10px] opacity-75">Peer Help</span>
+            </button>
+            <button (click)="setTab('library')" class="w-full text-left p-2 rounded-xl text-xs font-bold transition flex items-center justify-between" [ngClass]="activeTab === 'library' ? 'bg-amber-600 text-white' : 'text-slate-700 hover:bg-white'">
+              <span>20. Resource Library</span>
+              <span class="text-[10px] opacity-75">NCERT/Books</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== ACTIVE MODULE INTERACTIVE VIEW ==================== -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- ==================== DASHBOARD OVERVIEW ==================== -->
+    @if (activeTab === 'dashboard') {
+      <div class="space-y-8 animate-in fade-in duration-150">
+        <!-- AI Study Recommendation Callout -->
+        <div class="p-6 rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-[#172F61] text-white shadow-xl shadow-blue-900/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div class="space-y-1.5 max-w-2xl">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center font-bold text-xs">AI</span>
+              <span class="text-xs font-extrabold uppercase tracking-wider text-blue-200">Daily Preparation Prescription</span>
+            </div>
+            <h3 class="text-lg font-black leading-snug">
+              Boost your {{ exam.shortName }} score by 6 marks: Focus on Operating Systems Virtual Memory Paging today.
+            </h3>
+            <p class="text-xs text-blue-100 leading-relaxed">
+              Based on your last mock test performance, practicing 5 memory allocation questions will resolve your primary accuracy vulnerability before the weekend test.
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <button (click)="setTab('daily-practice')" class="px-5 py-3 rounded-2xl bg-white text-blue-800 text-xs font-extrabold hover:bg-blue-50 shadow-md transition whitespace-nowrap">
+              Solve 5 Daily Questions →
+            </button>
+            <button (click)="setTab('ai-tutor')" class="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-bold transition whitespace-nowrap">
+              Ask AI Tutor Doubts
+            </button>
+          </div>
+        </div>
+
+        <!-- Two-Column Quick Modules Display -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Left: High Yield Topics Checklist -->
+          <div class="lg:col-span-2 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+              <div>
+                <h3 class="text-base font-extrabold text-slate-900">High-Yield Subject Progress</h3>
+                <p class="text-xs text-slate-500">Track coverage across priority examination subjects.</p>
+              </div>
+              <button (click)="setTab('syllabus')" class="text-xs font-bold text-blue-600 hover:underline">Full Syllabus →</button>
+            </div>
+
+            <div class="space-y-4">
+              @for (sub of syllabusSubjects; track sub.name) {
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition">
+                  <div class="flex items-center justify-between text-xs font-bold text-slate-800 mb-1.5">
+                    <span>{{ sub.name }}</span>
+                    <div class="flex items-center gap-2">
+                      <span class="text-slate-400 font-normal">{{ sub.weightage }}</span>
+                      <span class="text-blue-600 font-black">{{ sub.progress }}%</span>
+                    </div>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+                    <div class="h-full bg-blue-600 rounded-full" [style.width.%]="sub.progress"></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Right: Weakness Radar & Community Pulse -->
+          <div class="space-y-6">
+            <!-- Weakness Radar Card -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                <h4 class="text-xs font-extrabold uppercase tracking-wider text-rose-600 flex items-center gap-1.5">
+                  <span>⚠️</span> Weakness Alerts
+                </h4>
+                <button (click)="setTab('weakness')" class="text-[11px] font-bold text-blue-600">View All</button>
+              </div>
+
+              <div class="space-y-3">
+                @for (w of weaknesses.slice(0, 2); track w.topic) {
+                  <div class="p-3 rounded-xl bg-rose-50/50 border border-rose-100 text-xs">
+                    <div class="flex justify-between font-bold text-slate-800 mb-0.5">
+                      <span>{{ w.topic }}</span>
+                      <span class="text-rose-600">{{ w.accuracy }}% Accuracy</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-snug">{{ w.remedy }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Leaderboard Mini Card -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                  <span>🏆</span> {{ exam.shortName }} Leaderboard
+                </h4>
+                <button (click)="setTab('leaderboard')" class="text-[11px] font-bold text-blue-600">Full Board</button>
+              </div>
+
+              <div class="space-y-2">
+                @for (u of leaderboard.slice(0, 3); track u.rank) {
+                  <div class="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs" [ngClass]="u.isCurrentUser ? 'bg-blue-50 font-bold border border-blue-100' : ''">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-6 h-6 rounded-lg text-center font-extrabold text-xs flex items-center justify-center" [ngClass]="u.rank === 1 ? 'bg-amber-400 text-white' : u.rank === 2 ? 'bg-slate-300 text-slate-800' : 'bg-amber-700/60 text-white'">
+                        {{ u.rank }}
+                      </span>
+                      <span class="font-bold text-slate-800">{{ u.name }}</span>
+                    </div>
+                    <span class="font-black text-blue-600">{{ u.score }} pts</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 1: SYLLABUS EXPLORER ==================== -->
+    @if (activeTab === 'syllabus') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="flex flex-wrap items-center justify-between pb-4 border-b border-slate-100 mb-6 gap-3">
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-900">1. Syllabus & Topic Mastery Tracker</h3>
+            <p class="text-xs text-slate-500">Check off completed topics to automatically update your preparation percentage.</p>
+          </div>
+          <a routerLink="/syllabus" class="px-4 py-2 rounded-xl bg-blue-50 text-blue-700 text-xs font-bold hover:bg-blue-100 transition">
+            Open Global Syllabus Explorer →
+          </a>
+        </div>
+
+        <div class="space-y-6">
+          @for (sub of syllabusSubjects; track sub.name) {
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <div>
+                  <h4 class="text-sm font-extrabold text-slate-900">{{ sub.name }}</h4>
+                  <div class="text-[11px] text-slate-500 font-semibold">{{ sub.weightage }}</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-extrabold text-blue-600">{{ sub.progress }}% Mastered</span>
+                  <div class="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div class="h-full bg-blue-600 rounded-full" [style.width.%]="sub.progress"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+                @for (topic of sub.topics; track topic.name) {
+                  <div
+                    (click)="toggleTopicCompletion(sub, topic)"
+                    class="p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-all"
+                    [ngClass]="topic.completed ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900' : 'bg-white border-slate-200 text-slate-700 hover:border-blue-300'"
+                  >
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold" [ngClass]="topic.completed ? 'bg-emerald-600 text-white' : 'border border-slate-300 bg-slate-50'">
+                        {{ topic.completed ? '✓' : '' }}
+                      </span>
+                      <span class="text-xs font-bold">{{ topic.name }}</span>
+                    </div>
+
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold"
+                          [ngClass]="topic.difficulty === 'Easy' ? 'bg-emerald-100 text-emerald-800' : topic.difficulty === 'Medium' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'">
+                      {{ topic.difficulty }}
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 2: AI PERSONAL TUTOR ==================== -->
+    @if (activeTab === 'ai-tutor') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded-md bg-blue-100 text-blue-700 text-xs font-bold">Dedicated</span>
+            <h3 class="text-lg font-extrabold text-slate-900">2. {{ exam.shortName }} AI Personal Tutor</h3>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">24/7 academic doubt clearing, formula derivation, and step-by-step problem solver indexed for {{ exam.shortName }}.</p>
+        </div>
+
+        <!-- Chat Conversation Stream -->
+        <div class="p-4 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200/80 min-h-[350px] max-h-[500px] overflow-y-auto space-y-4 mb-4">
+          @for (msg of aiConversation; track $index) {
+            <div class="flex gap-3" [ngClass]="msg.role === 'user' ? 'justify-end' : 'justify-start'">
+              @if (msg.role === 'assistant') {
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black text-xs flex items-center justify-center shrink-0">AI</div>
+              }
+              <div class="max-w-2xl p-4 rounded-2xl text-xs sm:text-sm leading-relaxed"
+                   [ngClass]="msg.role === 'user' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white border border-slate-200 text-slate-800 shadow-xs whitespace-pre-line'">
+                {{ msg.text }}
+                <div class="text-[10px] mt-2 text-right opacity-60">{{ msg.time }}</div>
+              </div>
+              @if (msg.role === 'user') {
+                <div class="w-8 h-8 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">ME</div>
+              }
+            </div>
+          }
+
+          @if (isAiThinking) {
+            <div class="flex items-center gap-2 text-xs font-bold text-blue-600 animate-pulse">
+              <span>Thinking, synthesizing steps & mathematical formulas...</span>
+            </div>
+          }
+        </div>
+
+        <!-- Suggested Prompt Chips -->
+        <div class="flex flex-wrap gap-2 mb-4">
+          <button (click)="sendAiQuestion('Explain P vs NP problem with a clean reduction example')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 text-[11px] font-bold text-slate-700 hover:text-blue-600 transition">
+            💡 Explain P vs NP & Reduction
+          </button>
+          <button (click)="sendAiQuestion('What is the formula for calculating pipeline speedup with branch stalls?')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 text-[11px] font-bold text-slate-700 hover:text-blue-600 transition">
+            📐 Pipeline Speedup Formula
+          </button>
+          <button (click)="sendAiQuestion('How does Bellman-Ford detect negative weight cycles in graphs?')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 text-[11px] font-bold text-slate-700 hover:text-blue-600 transition">
+            🔍 Bellman-Ford Negative Cycles
+          </button>
+        </div>
+
+        <!-- Chat Input Bar -->
+        <div class="flex gap-2">
+          <input
+            type="text"
+            [(ngModel)]="aiQueryInput"
+            (keydown.enter)="sendAiQuestion()"
+            placeholder="Ask your academic doubt or paste problem statement for {{ exam.shortName }}..."
+            class="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          >
+          <button
+            type="button"
+            (click)="sendAiQuestion()"
+            [disabled]="isAiThinking || !aiQueryInput.trim()"
+            class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-200 transition disabled:opacity-50 cursor-pointer"
+          >
+            Ask AI Tutor
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 3: STUDY MATERIALS & NOTES ==================== -->
+    @if (activeTab === 'materials') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-extrabold text-slate-900">3. High-Yield Study Materials & Notes</h3>
+          <p class="text-xs text-slate-500">Verified formula handbooks, summary cheat sheets, and toppers' handwritten revision PDFs.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          @for (mat of studyMaterials; track mat.id) {
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between hover:border-blue-300 transition">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800">{{ mat.type }}</span>
+                  <span class="text-xs font-bold text-amber-600">★ {{ mat.rating }} ({{ mat.downloads }} downloads)</span>
+                </div>
+                <h4 class="text-sm font-extrabold text-slate-900 mb-1">{{ mat.title }}</h4>
+                <p class="text-xs text-slate-500 mb-3">{{ mat.subject }} • {{ mat.pages }} Pages</p>
+              </div>
+
+              <div class="flex items-center gap-2 pt-3 border-t border-slate-200/60">
+                <button (click)="showToast('Opening verified note reader in preview mode!')" class="flex-1 py-2 text-center rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition">
+                  Read Online
+                </button>
+                <button (click)="showToast('Download started for ' + mat.title)" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 transition">
+                  ⬇ PDF
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 4: VIDEO RESOURCES ==================== -->
+    @if (activeTab === 'videos') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-extrabold text-slate-900">4. Curated Video Learning Lectures</h3>
+          <p class="text-xs text-slate-500">Top marathon video playlists, problem walkthroughs, and exam day strategy masterclasses.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          @for (vid of videoResources; track vid.id) {
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between hover:shadow-sm transition">
+              <div>
+                <div class="w-full h-32 rounded-xl bg-gradient-to-br from-indigo-900 to-blue-900 text-white flex items-center justify-center text-3xl font-black mb-3 shadow-inner">
+                  ▶
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700 mb-2 inline-block">{{ vid.subject }}</span>
+                <h4 class="text-xs sm:text-sm font-extrabold text-slate-900 mb-1 leading-snug">{{ vid.title }}</h4>
+                <p class="text-[11px] text-slate-500 mb-3">{{ vid.channel }} • {{ vid.duration }} • {{ vid.views }} views</p>
+              </div>
+
+              <button (click)="showToast('Launching video masterclass stream!')" class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition">
+                Watch Lecture →
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 5: MOCK TEST CENTER ==================== -->
+    @if (activeTab === 'mock-tests') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="flex flex-wrap items-center justify-between pb-4 border-b border-slate-100 mb-6 gap-3">
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-900">5. Mock Test Center & Examination Simulation</h3>
+            <p class="text-xs text-slate-500">Practice under authentic exam timing, sectional cutoffs, and negative marking rules.</p>
+          </div>
+          <a routerLink="/mock-tests" class="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 shadow-sm transition">
+            Launch Mock Test Engine →
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+            <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800">Full-Length</span>
+            <h4 class="text-sm font-extrabold text-slate-900 mt-2 mb-1">{{ exam.shortName }} All-India Mock #5</h4>
+            <p class="text-xs text-slate-500 mb-4">65 Questions • 100 Marks • 180 Minutes (Full Syllabus)</p>
+            <a routerLink="/mock-tests" class="block w-full py-2 text-center rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700">Start Test</a>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+            <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-indigo-100 text-indigo-800">Sectional</span>
+            <h4 class="text-sm font-extrabold text-slate-900 mt-2 mb-1">Algorithms & Data Structures Mini Test</h4>
+            <p class="text-xs text-slate-500 mb-4">25 Questions • 40 Marks • 60 Minutes</p>
+            <a routerLink="/mock-tests" class="block w-full py-2 text-center rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700">Start Test</a>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+            <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 text-purple-800">Speed Drill</span>
+            <h4 class="text-sm font-extrabold text-slate-900 mt-2 mb-1">General Aptitude & Reasoning Sprint</h4>
+            <p class="text-xs text-slate-500 mb-4">15 Questions • 25 Marks • 30 Minutes</p>
+            <a routerLink="/mock-tests" class="block w-full py-2 text-center rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-700">Start Test</a>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 6: PREVIOUS YEAR QUESTIONS ==================== -->
+    @if (activeTab === 'pyqs') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="flex flex-wrap items-center justify-between pb-4 border-b border-slate-100 mb-6 gap-3">
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-900">6. Previous Year Question Bank (PYQs)</h3>
+            <p class="text-xs text-slate-500">Searchable examination papers from 2018 to 2024 with verified answer keys.</p>
+          </div>
+          <a routerLink="/pyq-bank" class="px-4 py-2 rounded-xl bg-blue-50 text-blue-700 text-xs font-bold hover:bg-blue-100 transition">
+            Explore All PYQ Banks →
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          @for (year of [2024, 2023, 2022, 2021]; track year) {
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between">
+              <div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-blue-100 text-blue-800">{{ year }} Paper</span>
+                <h4 class="text-xs font-extrabold text-slate-900 mt-2 mb-1">{{ exam.shortName }} Solved Paper</h4>
+                <p class="text-[11px] text-slate-500 mb-3">Verified Official Keys & Video Explanations</p>
+              </div>
+              <a routerLink="/pyq-bank" class="w-full py-2 text-center rounded-xl bg-white border border-slate-200 text-xs font-bold text-blue-600 hover:bg-blue-50">
+                Solve {{ year }} PYQs
+              </a>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 7: DAILY PRACTICE QUESTIONS ==================== -->
+    @if (activeTab === 'daily-practice') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-900">7. Daily Practice Questions (5 High-Yield Questions)</h3>
+            <p class="text-xs text-slate-500">Solve 5 new questions daily to maintain your study streak and sharpen speed.</p>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800">Streak: {{ exam.studyStreakDays }} Days 🔥</span>
+        </div>
+
+        <div class="space-y-6">
+          @for (q of dailyQuestions; track q.id) {
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+              <div class="flex items-center justify-between text-xs font-bold mb-2">
+                <span class="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800">{{ q.subject }}</span>
+                <span class="text-slate-400">Question {{ q.id }} of 5 • {{ q.difficulty }}</span>
+              </div>
+
+              <h4 class="text-sm font-bold text-slate-900 mb-4 leading-relaxed">{{ q.question }}</h4>
+
+              <!-- Options -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                @for (opt of q.options; track $index) {
+                  <button
+                    type="button"
+                    (click)="selectOption(q, $index)"
+                    [disabled]="q.isAnswered"
+                    class="p-3 rounded-xl border text-left text-xs font-semibold transition-all cursor-pointer"
+                    [ngClass]="{
+                      'bg-white border-slate-200 hover:border-blue-400': !q.isAnswered,
+                      'bg-emerald-100 border-emerald-400 text-emerald-900 font-bold': q.isAnswered && $index === q.correctIndex,
+                      'bg-rose-100 border-rose-400 text-rose-900 font-bold': q.isAnswered && q.selectedOption === $index && $index !== q.correctIndex,
+                      'bg-slate-100 text-slate-400 border-slate-200': q.isAnswered && $index !== q.correctIndex && q.selectedOption !== $index
+                    }"
+                  >
+                    <span class="font-bold mr-2">{{ ['A', 'B', 'C', 'D'][$index] }}.</span>
+                    <span>{{ opt }}</span>
+                  </button>
+                }
+              </div>
+
+              <!-- Answer Explanation Box -->
+              @if (q.isAnswered) {
+                <div class="p-3.5 rounded-xl bg-blue-50/70 border border-blue-100 text-xs text-slate-700 leading-relaxed">
+                  <strong class="text-blue-900 block mb-1">Explanation:</strong>
+                  {{ q.explanation }}
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 8: TOPIC-WISE PRACTICE ARENA ==================== -->
+    @if (activeTab === 'topic-arena') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-extrabold text-slate-900">8. Topic-Wise Practice Arena</h3>
+          <p class="text-xs text-slate-500">Drill into specific chapters and topics by difficulty to eliminate mistakes.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          @for (sub of syllabusSubjects; track sub.name) {
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between">
+              <div>
+                <h4 class="text-sm font-extrabold text-slate-900 mb-1">{{ sub.name }}</h4>
+                <p class="text-xs text-slate-500 mb-3">{{ sub.topics.length }} Interactive Drill Sets</p>
+                <div class="flex gap-1.5 mb-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Easy</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">Medium</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800">Hard</span>
+                </div>
+              </div>
+
+              <button (click)="showToast('Launching ' + sub.name + ' practice drill!')" class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition">
+                Start Drill Session →
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 9: AI STUDY PLANNER ==================== -->
+    @if (activeTab === 'planner') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="flex flex-wrap items-center justify-between pb-4 border-b border-slate-100 mb-6 gap-3">
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-900">9. AI Adaptive Study Planner</h3>
+            <p class="text-xs text-slate-500">Dynamic weekly timetable adapted to your daily 4-hour target and exam date.</p>
+          </div>
+          <a routerLink="/study-planner" class="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 shadow-sm transition">
+            Open Advanced Planner →
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-2xl bg-blue-50 border border-blue-100">
+            <span class="text-[10px] font-extrabold text-blue-700 uppercase">Today (Day 1)</span>
+            <h4 class="text-xs font-bold text-slate-900 mt-1">Algorithms • Shortest Paths & Dynamic Programming</h4>
+            <div class="text-[11px] text-slate-500 mt-2">Target: 3 hrs theory + 20 PYQs</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
+            <span class="text-[10px] font-extrabold text-indigo-700 uppercase">Tomorrow (Day 2)</span>
+            <h4 class="text-xs font-bold text-slate-900 mt-1">Operating Systems • Memory Paging & Replacement</h4>
+            <div class="text-[11px] text-slate-500 mt-2">Target: 2.5 hrs theory + 1 sectional test</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-purple-50 border border-purple-100">
+            <span class="text-[10px] font-extrabold text-purple-700 uppercase">Day 3 (Weekend Review)</span>
+            <h4 class="text-xs font-bold text-slate-900 mt-1">Full-Length Mini Mock Test #3</h4>
+            <div class="text-[11px] text-slate-500 mt-2">Target: 2 hours simulation + AI error audit</div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 10: AI PERFORMANCE ANALYTICS ==================== -->
+    @if (activeTab === 'analytics') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-extrabold text-slate-900">10. AI Performance Analytics & Score Forecasting</h3>
+          <p class="text-xs text-slate-500">Real-time prediction of percentile, speed per question, and accuracy distribution.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="text-xs font-bold text-slate-400 uppercase">Average Speed per Question</div>
+            <div class="text-2xl font-black text-slate-900 mt-1">{{ averageSpeedPerQuestion }}</div>
+            <p class="text-[11px] text-emerald-600 font-bold mt-1">{{ exam.questionsSolvedCount > 0 ? 'Calculated from practice sessions' : 'Attempt practice questions to measure' }}</p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="text-xs font-bold text-slate-400 uppercase">Predicted Cutoff Margin</div>
+            <div class="text-2xl font-black text-blue-600 mt-1">{{ exam.readinessScore >= 30 ? '+' + (exam.readinessScore - 40 > 0 ? exam.readinessScore - 40 : 5) : '—' }} <span class="text-xs font-semibold text-slate-400">{{ exam.readinessScore >= 30 ? 'Marks' : '' }}</span></div>
+            <p class="text-[11px] text-blue-600 font-bold mt-1">{{ exam.readinessScore >= 30 ? 'Estimated qualifying buffer' : 'Unlocks after 30% readiness' }}</p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="text-xs font-bold text-slate-400 uppercase">Estimated National Percentile</div>
+            <div class="text-2xl font-black text-purple-600 mt-1">{{ exam.readinessScore >= 20 ? (exam.readinessScore >= 80 ? '97.5%' : exam.readinessScore >= 60 ? '88.2%' : '72.0%') : '—' }}</div>
+            <p class="text-[11px] text-purple-600 font-bold mt-1">{{ totalMockTestsAttempted > 0 ? 'Based on ' + totalMockTestsAttempted + ' mock test(s)' : 'Based on daily practice & syllabus progress' }}</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 11: SMART RECOMMENDATIONS ==================== -->
+    @if (activeTab === 'recommendations') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-extrabold text-slate-900">11. Smart Question Recommendations</h3>
+          <p class="text-xs text-slate-500">AI-curated question pool specifically designed to target your lowest-accuracy concepts.</p>
+        </div>
+
+        <div class="space-y-3">
+          <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-200 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-blue-700 uppercase">Target: Regular Expressions Pumping Lemma</span>
+              <h4 class="text-xs font-extrabold text-slate-900 mt-0.5">Solve 5 Formal Proof Questions with step-by-step guidance</h4>
+            </div>
+            <button (click)="setTab('ai-tutor')" class="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold">Solve Now</button>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-200 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-indigo-700 uppercase">Target: TCP Window Flow Control</span>
+              <h4 class="text-xs font-extrabold text-slate-900 mt-0.5">Solve 4 Numerical Calculations on Bandwidth-Delay Product</h4>
+            </div>
+            <button (click)="setTab('ai-tutor')" class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold">Solve Now</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 12: AI ANSWER EVALUATION ==================== -->
+    @if (activeTab === 'answer-eval') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-extrabold text-slate-900">12. AI Subjective Answer Evaluation</h3>
+          <p class="text-xs text-slate-500">Submit your written response or solution approach for immediate AI grading, rubric scoring, and feedback.</p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 mb-4">
+          <strong class="text-xs font-bold text-slate-700 block mb-1">Sample Evaluation Question:</strong>
+          <p class="text-xs font-semibold text-slate-900">{{ answerQuestionPrompt }}</p>
+        </div>
+
+        <textarea
+          rows="5"
+          [(ngModel)]="answerInput"
+          placeholder="Write your explanation, steps, or essay outline here..."
+          class="w-full p-4 rounded-2xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none mb-4"
+        ></textarea>
+
+        <button
+          type="button"
+          (click)="evaluateAnswer()"
+          [disabled]="isEvaluating || !answerInput.trim()"
+          class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-200 transition disabled:opacity-50 cursor-pointer mb-6"
+        >
+          {{ isEvaluating ? 'Evaluating Rubrics...' : 'Evaluate My Answer' }}
+        </button>
+
+        @if (evaluationResult) {
+          <div class="p-6 rounded-2xl bg-emerald-50/60 border border-emerald-200 animate-in zoom-in-95 duration-150">
+            <div class="flex items-center justify-between pb-3 border-b border-emerald-200 mb-4">
+              <div>
+                <span class="text-xs font-extrabold uppercase text-emerald-800">Evaluation Result</span>
+                <h4 class="text-base font-black text-slate-900">Score: {{ evaluationResult.score }} / {{ evaluationResult.maxScore }} ({{ evaluationResult.grade }})</h4>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-700 leading-relaxed mb-4">{{ evaluationResult.feedback }}</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div class="p-3 rounded-xl bg-white border border-emerald-100">
+                <strong class="text-emerald-700 block mb-1">Key Strengths:</strong>
+                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                  @for (s of evaluationResult.strengths; track s) {
+                    <li>{{ s }}</li>
+                  }
+                </ul>
+              </div>
+
+              <div class="p-3 rounded-xl bg-white border border-amber-100">
+                <strong class="text-amber-700 block mb-1">Suggested Refinements:</strong>
+                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                  @for (imp of evaluationResult.improvements; track imp) {
+                    <li>{{ imp }}</li>
+                  }
+                </ul>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ==================== MODULE 13: SMART REVISION ASSISTANT ==================== -->
+    @if (activeTab === 'revision') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-extrabold text-slate-900">13. Smart Spaced Repetition Revision Assistant</h3>
+          <p class="text-xs text-slate-500">Scientifically scheduled flash revision cards to stop the forgetting curve.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="p-5 rounded-2xl bg-rose-50 border border-rose-200">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-600 text-white">Due Today (Urgent)</span>
+            <h4 class="text-xs font-bold text-slate-900 mt-2 mb-1">Process Deadlock Avoidance (Banker's Algorithm)</h4>
+            <p class="text-[11px] text-slate-500 mb-4">Last revised 7 days ago. Accuracy drop detected.</p>
+            <button (click)="showToast('Revision session opened!')" class="w-full py-2 rounded-xl bg-rose-600 text-white text-xs font-bold">Revise 5 Mins</button>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-amber-50 border border-amber-200">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-600 text-white">Due in 3 Days</span>
+            <h4 class="text-xs font-bold text-slate-900 mt-2 mb-1">Discrete Mathematics: Recurrence Relations</h4>
+            <p class="text-[11px] text-slate-500 mb-4">Master Theorem cases review scheduled.</p>
+            <button (click)="showToast('Reminder confirmed for Day +3')" class="w-full py-2 rounded-xl bg-white border border-amber-200 text-amber-800 text-xs font-bold">Schedule Alert</button>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-emerald-50 border border-emerald-200">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white">Due in 7 Days</span>
+            <h4 class="text-xs font-bold text-slate-900 mt-2 mb-1">SQL Joins & Relational Algebra Equivalences</h4>
+            <p class="text-[11px] text-slate-500 mb-4">Long term retention stage (88% strength).</p>
+            <button (click)="showToast('Retained in Spaced Repetition queue')" class="w-full py-2 rounded-xl bg-white border border-emerald-200 text-emerald-800 text-xs font-bold">Keep in Queue</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 14: PREPARATION PROGRESS TRACKER ==================== -->
+    @if (activeTab === 'progress-tracker') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-extrabold text-slate-900">14. Preparation Milestone Roadmap</h3>
+          <p class="text-xs text-slate-500">From foundation building to All-India Rank readiness.</p>
+        </div>
+
+        <div class="space-y-4">
+          <div class="p-4 rounded-2xl border flex items-center justify-between"
+               [ngClass]="exam.syllabusCompletion >= 30 ? 'bg-emerald-50 border-emerald-200' : 'bg-blue-50 border-blue-200'">
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-xl text-white flex items-center justify-center font-bold text-xs"
+                    [ngClass]="exam.syllabusCompletion >= 30 ? 'bg-emerald-600' : 'bg-blue-600'">
+                {{ exam.syllabusCompletion >= 30 ? '✓' : '●' }}
+              </span>
+              <div>
+                <h4 class="text-xs font-bold text-slate-900">Milestone 1: Core Foundation & Syllabus Grounding</h4>
+                <div class="text-[10px]" [ngClass]="exam.syllabusCompletion >= 30 ? 'text-emerald-700' : 'text-blue-700'">
+                  {{ exam.syllabusCompletion >= 30 ? 'Completed (' + completedTopicsCount + ' topics mastered)' : 'In Progress (' + exam.syllabusCompletion + '% / 30% needed)' }}
+                </div>
+              </div>
+            </div>
+            <span class="text-xs font-extrabold" [ngClass]="exam.syllabusCompletion >= 30 ? 'text-emerald-600' : 'text-blue-600'">
+              {{ exam.syllabusCompletion >= 30 ? 'Done' : 'Active' }}
+            </span>
+          </div>
+
+          <div class="p-4 rounded-2xl border flex items-center justify-between"
+               [ngClass]="exam.syllabusCompletion >= 70 && exam.questionsSolvedCount >= 20 ? 'bg-emerald-50 border-emerald-200' : exam.syllabusCompletion >= 30 ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-200 opacity-60'">
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-xl text-white flex items-center justify-center font-bold text-xs"
+                    [ngClass]="exam.syllabusCompletion >= 70 && exam.questionsSolvedCount >= 20 ? 'bg-emerald-600' : exam.syllabusCompletion >= 30 ? 'bg-blue-600' : 'bg-slate-300 text-slate-700'">
+                {{ exam.syllabusCompletion >= 70 && exam.questionsSolvedCount >= 20 ? '✓' : exam.syllabusCompletion >= 30 ? '●' : '2' }}
+              </span>
+              <div>
+                <h4 class="text-xs font-bold text-slate-900">Milestone 2: High-Yield Problem Solving & Sectional Mocks</h4>
+                <div class="text-[10px]" [ngClass]="exam.syllabusCompletion >= 70 && exam.questionsSolvedCount >= 20 ? 'text-emerald-700' : exam.syllabusCompletion >= 30 ? 'text-blue-700' : 'text-slate-500'">
+                  {{ exam.syllabusCompletion >= 70 && exam.questionsSolvedCount >= 20 ? 'Completed (' + exam.questionsSolvedCount + ' questions solved)' : exam.syllabusCompletion >= 30 ? 'In Progress (' + exam.syllabusCompletion + '% syllabus, ' + exam.questionsSolvedCount + ' questions solved)' : 'Unlocks after Milestone 1 (30% syllabus)' }}
+                </div>
+              </div>
+            </div>
+            <span class="text-xs font-extrabold" [ngClass]="exam.syllabusCompletion >= 70 && exam.questionsSolvedCount >= 20 ? 'text-emerald-600' : exam.syllabusCompletion >= 30 ? 'text-blue-600' : 'text-slate-400'">
+              {{ exam.syllabusCompletion >= 70 && exam.questionsSolvedCount >= 20 ? 'Done' : exam.syllabusCompletion >= 30 ? 'Active' : 'Locked' }}
+            </span>
+          </div>
+
+          <div class="p-4 rounded-2xl border flex items-center justify-between"
+               [ngClass]="totalMockTestsAttempted >= 3 ? 'bg-emerald-50 border-emerald-200' : totalMockTestsAttempted >= 1 ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-200 opacity-60'">
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-xl text-white flex items-center justify-center font-bold text-xs"
+                    [ngClass]="totalMockTestsAttempted >= 3 ? 'bg-emerald-600' : totalMockTestsAttempted >= 1 ? 'bg-blue-600' : 'bg-slate-300 text-slate-700'">
+                {{ totalMockTestsAttempted >= 3 ? '✓' : totalMockTestsAttempted >= 1 ? '●' : '3' }}
+              </span>
+              <div>
+                <h4 class="text-xs font-bold text-slate-900">Milestone 3: Full-Length Mocks & Elimination Strategies</h4>
+                <div class="text-[10px]" [ngClass]="totalMockTestsAttempted >= 3 ? 'text-emerald-700' : totalMockTestsAttempted >= 1 ? 'text-blue-700' : 'text-slate-500'">
+                  {{ totalMockTestsAttempted >= 3 ? 'Completed (' + totalMockTestsAttempted + ' tests taken)' : totalMockTestsAttempted >= 1 ? 'In Progress (' + totalMockTestsAttempted + ' test taken)' : 'Unlocks after completing your first mock test' }}
+                </div>
+              </div>
+            </div>
+            <span class="text-xs font-bold" [ngClass]="totalMockTestsAttempted >= 3 ? 'text-emerald-600' : totalMockTestsAttempted >= 1 ? 'text-blue-600' : 'text-slate-400'">
+              {{ totalMockTestsAttempted >= 3 ? 'Done' : totalMockTestsAttempted >= 1 ? 'Active' : 'Locked' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 15: ALL INDIA LEADERBOARD ==================== -->
+    @if (activeTab === 'leaderboard') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-extrabold text-slate-900">15. {{ exam.shortName }} All India Leaderboard</h3>
+          <p class="text-xs text-slate-500">Benchmark your marks, accuracy percentage, and test consistency against fellow aspirants.</p>
+        </div>
+
+        <div class="space-y-3">
+          @for (u of leaderboard; track u.rank) {
+            <div class="flex items-center justify-between p-4 rounded-2xl border transition"
+                 [ngClass]="u.isCurrentUser ? 'bg-blue-50 border-blue-200 ring-2 ring-blue-100' : 'bg-slate-50 border-slate-200/70'">
+              <div class="flex items-center gap-3.5">
+                <span class="w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs text-white"
+                      [ngClass]="u.rank === 1 ? 'bg-amber-400' : u.rank === 2 ? 'bg-slate-400' : u.rank === 3 ? 'bg-amber-700' : 'bg-slate-600'">
+                  #{{ u.rank }}
+                </span>
+                <div>
+                  <div class="text-xs font-bold text-slate-900 flex items-center gap-2">
+                    {{ u.name }}
+                    @if (u.isCurrentUser) {
+                      <span class="px-2 py-0.2 rounded-full text-[9px] font-extrabold bg-blue-600 text-white">You</span>
+                    }
+                  </div>
+                  <div class="text-[10px] text-slate-500">Accuracy: {{ u.accuracy }}% • {{ u.streak }} Day Streak 🔥</div>
+                </div>
+              </div>
+
+              <div class="text-right">
+                <span class="text-base font-black text-blue-600">{{ u.score }}</span>
+                <span class="text-[10px] text-slate-400 block font-semibold">points</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 16: STREAK & ACHIEVEMENTS ==================== -->
+    @if (activeTab === 'achievements') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-extrabold text-slate-900">16. Study Streak & Milestone Badges</h3>
+          <p class="text-xs text-slate-500">Consistency is the number one predictor of competitive examination success.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white mb-6 flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-amber-100 uppercase">Active Learning Streak</div>
+            <div class="text-3xl font-black mt-1">{{ exam.studyStreakDays }} Days Active 🔥</div>
+            <p class="text-xs text-amber-100 mt-1">Study for 30 minutes today to extend to Day 8!</p>
+          </div>
+          <button (click)="showToast('Streak Shield active: 1 Missed day forgiven!')" class="px-4 py-2.5 rounded-xl bg-white text-amber-800 text-xs font-bold shadow-md">
+            Streak Freeze: 1 Active 🛡️
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="p-4 rounded-2xl border text-center transition"
+               [ngClass]="exam.questionsSolvedCount >= 1 ? 'bg-emerald-50 border-emerald-200 shadow-xs' : 'bg-slate-50 border-slate-200 opacity-60'">
+            <div class="text-3xl mb-1">🎯</div>
+            <div class="text-xs font-bold text-slate-900">First Practice</div>
+            <div class="text-[10px] font-bold" [ngClass]="exam.questionsSolvedCount >= 1 ? 'text-emerald-600' : 'text-slate-400'">
+              {{ exam.questionsSolvedCount >= 1 ? 'Unlocked' : exam.questionsSolvedCount + '/1 Qs' }}
+            </div>
+          </div>
+          <div class="p-4 rounded-2xl border text-center transition"
+               [ngClass]="totalMockTestsAttempted >= 1 ? 'bg-emerald-50 border-emerald-200 shadow-xs' : 'bg-slate-50 border-slate-200 opacity-60'">
+            <div class="text-3xl mb-1">📝</div>
+            <div class="text-xs font-bold text-slate-900">First Mock</div>
+            <div class="text-[10px] font-bold" [ngClass]="totalMockTestsAttempted >= 1 ? 'text-emerald-600' : 'text-slate-400'">
+              {{ totalMockTestsAttempted >= 1 ? 'Unlocked' : totalMockTestsAttempted + '/1 Mocks' }}
+            </div>
+          </div>
+          <div class="p-4 rounded-2xl border text-center transition"
+               [ngClass]="exam.totalStudyHours >= 1 ? 'bg-emerald-50 border-emerald-200 shadow-xs' : 'bg-slate-50 border-slate-200 opacity-60'">
+            <div class="text-3xl mb-1">⏱️</div>
+            <div class="text-xs font-bold text-slate-900">Focus Master</div>
+            <div class="text-[10px] font-bold" [ngClass]="exam.totalStudyHours >= 1 ? 'text-emerald-600' : 'text-slate-400'">
+              {{ exam.totalStudyHours >= 1 ? 'Unlocked' : exam.totalStudyHours + '/1.0 Hrs' }}
+            </div>
+          </div>
+          <div class="p-4 rounded-2xl border text-center transition"
+               [ngClass]="exam.questionsSolvedCount >= 100 ? 'bg-emerald-50 border-emerald-200 shadow-xs' : 'bg-slate-50 border-slate-200 opacity-60'">
+            <div class="text-3xl mb-1">👑</div>
+            <div class="text-xs font-bold text-slate-900">Century Club</div>
+            <div class="text-[10px] font-bold" [ngClass]="exam.questionsSolvedCount >= 100 ? 'text-emerald-600' : 'text-slate-400'">
+              {{ exam.questionsSolvedCount >= 100 ? 'Unlocked' : exam.questionsSolvedCount + '/100 Qs' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 17: WEAKNESS DETECTION SYSTEM ==================== -->
+    @if (activeTab === 'weakness') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-extrabold text-slate-900">17. AI Weakness Detection & Diagnostic Recovery</h3>
+          <p class="text-xs text-slate-500">Autonomous analysis of your recurring test errors and recommended remedies.</p>
+        </div>
+
+        <div class="space-y-4">
+          @for (w of weaknesses; track w.topic) {
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-black"
+                        [ngClass]="w.priority === 'High' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'">
+                    {{ w.priority }} Priority Alert
+                  </span>
+                  <span class="text-xs font-bold text-slate-500">{{ w.subject }}</span>
+                </div>
+                <h4 class="text-sm font-extrabold text-slate-900">{{ w.topic }}</h4>
+                <p class="text-xs text-slate-600 leading-relaxed">{{ w.remedy }}</p>
+              </div>
+
+              <div class="text-right shrink-0">
+                <div class="text-base font-black text-rose-600">{{ w.accuracy }}% Accuracy</div>
+                <button (click)="sendAiQuestion('Give me 5 practice questions with explanations for ' + w.topic); setTab('ai-tutor')" class="mt-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition">
+                  Fix with AI Mentor →
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 18: EXAM UPDATES & NOTIFICATIONS ==================== -->
+    @if (activeTab === 'updates') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-extrabold text-slate-900">18. Official Examination Notifications & Updates</h3>
+          <p class="text-xs text-slate-500">Verified official notifications, application dates, admit card timelines, and syllabi notices.</p>
+        </div>
+
+        <div class="space-y-4">
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-[10px] font-bold text-emerald-800 uppercase">Information Bulletin Verified</span>
+              <span class="text-[11px] text-slate-500">Official Portal</span>
+            </div>
+            <h4 class="text-xs font-extrabold text-slate-900">{{ exam.shortName }} Information Brochure Released</h4>
+            <p class="text-xs text-slate-600 mt-1">Application window opens with no alterations to the two-paper computer-based test pattern.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-[10px] font-bold text-slate-500 uppercase">Schedule Confirmation</span>
+              <span class="text-[11px] text-slate-500">{{ exam.examDateText }}</span>
+            </div>
+            <h4 class="text-xs font-extrabold text-slate-900">Admit Card Download Window Expected 14 Days Prior</h4>
+            <p class="text-xs text-slate-600 mt-1">Students are advised to keep verified photo ID and admit card copies printed in advance.</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 19: DISCUSSION FORUM ==================== -->
+    @if (activeTab === 'forum') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="flex flex-wrap items-center justify-between pb-4 border-b border-slate-100 mb-6 gap-3">
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-900">19. {{ exam.shortName }} Student Discussion Forum</h3>
+            <p class="text-xs text-slate-500">Collaborate with fellow aspirants, share shortcut formulas, and clear doubts.</p>
+          </div>
+          <button (click)="isCreatingPost = !isCreatingPost" class="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition">
+            {{ isCreatingPost ? 'Close Post Form' : '+ Ask Community' }}
+          </button>
+        </div>
+
+        @if (isCreatingPost) {
+          <div class="p-5 rounded-2xl bg-blue-50/60 border border-blue-200 mb-6 space-y-3">
+            <h4 class="text-xs font-bold text-blue-900 uppercase">Post a New Question / Topic</h4>
+            <input type="text" [(ngModel)]="newPostTitle" placeholder="Title: e.g. How to handle negative cycles in Bellman-Ford?" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:outline-none">
+            <textarea rows="3" [(ngModel)]="newPostContent" placeholder="Describe your doubt, context or strategy..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:outline-none"></textarea>
+            <button (click)="createForumPost()" class="px-5 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700">Submit Post</button>
+          </div>
+        }
+
+        <div class="space-y-4">
+          @for (post of forumPosts; track post.id) {
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-blue-200 transition">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-800 font-bold text-xs flex items-center justify-center">{{ post.avatar }}</span>
+                  <span class="text-xs font-bold text-slate-900">{{ post.author }}</span>
+                  <span class="text-[10px] text-slate-400">• {{ post.timeAgo }}</span>
+                </div>
+                <span class="text-[10px] font-bold bg-slate-200 px-2 py-0.5 rounded text-slate-600">{{ post.subject }}</span>
+              </div>
+
+              <h4 class="text-sm font-bold text-slate-900 mb-1.5">{{ post.title }}</h4>
+              <p class="text-xs text-slate-600 leading-relaxed mb-4">{{ post.content }}</p>
+
+              <div class="flex items-center gap-4 text-xs font-bold text-slate-500 pt-3 border-t border-slate-200/60">
+                <button (click)="togglePostUpvote(post)" class="flex items-center gap-1.5 hover:text-blue-600 transition" [ngClass]="post.userUpvoted ? 'text-blue-600' : ''">
+                  <span>▲</span>
+                  <span>{{ post.upvotes }} Upvotes</span>
+                </button>
+                <span>💬 {{ post.repliesCount }} Replies</span>
+                <button (click)="showToast('Reply drawer opened!')" class="text-blue-600 hover:underline">Reply</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ==================== MODULE 20: DIGITAL RESOURCE LIBRARY ==================== -->
+    @if (activeTab === 'library') {
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-in fade-in duration-150">
+        <div class="pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-extrabold text-slate-900">20. Digital Resource & Standard Reference Library</h3>
+          <p class="text-xs text-slate-500">Standard textbooks, reference manuals, syllabus PDFs, and verified formula archives.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="text-3xl mb-2">📚</div>
+            <h4 class="text-xs font-bold text-slate-900 mb-1">Standard Reference Books List</h4>
+            <p class="text-[11px] text-slate-500 mb-3">Authoritative author recommendations for {{ exam.shortName }}.</p>
+            <button (click)="showToast('Books bibliography opened!')" class="text-xs font-bold text-blue-600 hover:underline">View Booklist →</button>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="text-3xl mb-2">📑</div>
+            <h4 class="text-xs font-bold text-slate-900 mb-1">Official Syllabus Master PDF</h4>
+            <p class="text-[11px] text-slate-500 mb-3">Direct downloadable verified syllabus with subtopic indexes.</p>
+            <button (click)="showToast('Official syllabus PDF download started!')" class="text-xs font-bold text-blue-600 hover:underline">Download PDF →</button>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="text-3xl mb-2">🗺️</div>
+            <h4 class="text-xs font-bold text-slate-900 mb-1">Subject Mind Maps & Flowcharts</h4>
+            <p class="text-[11px] text-slate-500 mb-3">High-resolution visual concept maps for rapid memory recall.</p>
+            <button (click)="showToast('Mind maps loaded in interactive canvas!')" class="text-xs font-bold text-blue-600 hover:underline">Open Mind Maps →</button>
+          </div>
+        </div>
+      </div>
+    }
+
+  </section>
+</div>
+
+<!-- ==================== FOCUS MODE POMODORO TIMER MODAL ==================== -->
+@if (isFocusModalOpen) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl border border-slate-100 text-center animate-in zoom-in-95 duration-150">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-6">
+        <span class="text-xs font-black uppercase tracking-wider" [ngClass]="timerMode === 'focus' ? 'text-amber-600' : 'text-emerald-600'">
+          {{ timerMode === 'focus' ? '🎯 Focus Study Sprint' : '☕ Rest & Refresh' }}
+        </span>
+        <button (click)="closeFocusModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+      </div>
+
+      <!-- Big Timer Display -->
+      <div class="py-8 my-4 rounded-3xl bg-slate-900 text-white font-mono text-6xl font-black tracking-widest shadow-inner">
+        {{ formatTimerTime(timerSecondsLeft) }}
+      </div>
+
+      <p class="text-xs text-slate-500 mb-6">
+        {{ timerMode === 'focus' ? 'Zero distractions. Focus on mastering this concept.' : 'Take a stretch, hydrate, and get ready for the next round.' }}
+      </p>
+
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          (click)="toggleFocusTimer()"
+          class="flex-1 py-3.5 rounded-2xl text-xs font-black tracking-wide text-white transition-all shadow-md cursor-pointer"
+          [ngClass]="isTimerRunning ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200'"
+        >
+          {{ isTimerRunning ? 'Pause Timer' : 'Start Focus Sprint' }}
+        </button>
+
+        <button
+          type="button"
+          (click)="resetFocusTimer(25)"
+          class="px-5 py-3.5 rounded-2xl bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200"
+        >
+          Reset (25m)
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ==================== CURRENT AFFAIRS INTELLIGENCE MODAL ==================== -->
+@if (isCurrentAffairsOpen) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+    <div class="w-full max-w-2xl max-h-[85vh] bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col animate-in zoom-in-95 duration-150">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">📰</span>
+          <div>
+            <h3 class="text-base font-extrabold text-slate-900">Daily Current Affairs Intelligence</h3>
+            <p class="text-xs text-slate-500">Curated high-yield news bullets directly relevant to competitive examinations.</p>
+          </div>
+        </div>
+        <button (click)="isCurrentAffairsOpen = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto space-y-4 pr-1">
+        @for (item of currentAffairs; track item.id) {
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800">{{ item.category }}</span>
+              <span class="text-[10px] font-bold text-slate-400">{{ item.date }}</span>
+            </div>
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-900 mb-1">{{ item.title }}</h4>
+            <p class="text-xs text-slate-600 leading-relaxed">{{ item.summary }}</p>
+          </div>
+        }
+      </div>
+
+      <div class="pt-4 border-t border-slate-100 mt-4 flex justify-end">
+        <button (click)="isCurrentAffairsOpen = false" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,1596 @@
+<main class="min-h-screen bg-slate-50 text-slate-800">
+  <!-- ========================================================= -->
+  <!-- SECTION 1: HERO SECTION (5-Second Rotating Background)    -->
+  <!-- ========================================================= -->
+  <section class="relative min-h-[640px] flex items-center justify-center overflow-hidden">
+    <!-- Rotating Background Images -->
+    @for (img of heroImages; track img; let i = $index) {
+      <div
+        class="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out"
+        [style.backgroundImage]="'url(' + img + ')'"
+        [class.opacity-100]="currentImageIndex() === i"
+        [class.opacity-0]="currentImageIndex() !== i"
+      ></div>
+    }
+
+    <!-- Deep Navy & Royal Blue Glass Overlay -->
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-[#0f1f42]/95 via-[#172F61]/85 to-slate-900/90 backdrop-blur-[2px]"
+    ></div>
+
+    <!-- Hero Content -->
+    <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center text-white">
+      <span
+        class="inline-flex items-center gap-2 px-4 py-1.5 mb-5 text-xs font-bold tracking-widest uppercase bg-blue-500/20 border border-blue-400/40 text-blue-200 rounded-full"
+      >
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        AI-Powered Competitive Exam Ecosystem
+      </span>
+
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+        WELCOME STUDENTS TO <br />
+        <span
+          class="bg-gradient-to-r from-white via-blue-100 to-blue-300 bg-clip-text text-transparent"
+        >
+          EXAM SPHERE AI
+        </span>
+      </h1>
+
+      <p
+        class="mt-6 max-w-2xl mx-auto text-base sm:text-xl text-blue-100/95 font-normal leading-relaxed"
+      >
+        Personalized AI tutoring, adaptive mock tests, and diagnostic analytics built for ambitious
+        learners unified workspace for competitive exam mastery.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="mt-8 flex flex-wrap justify-center gap-4">
+        @if (!currentUser()) {
+          <a
+            routerLink="/auth"
+            class="px-8 py-3.5 text-base font-bold bg-[#315FEA] hover:bg-blue-500 text-white rounded-xl shadow-lg shadow-blue-950/50 transition-all flex items-center gap-2"
+          >
+            <span>Get Started / Log In</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
+            </svg>
+          </a>
+        } @else {
+          <a
+            routerLink="/study-planner"
+            class="px-8 py-3.5 text-base font-bold bg-[#315FEA] hover:bg-blue-500 text-white rounded-xl shadow-lg shadow-blue-950/50 transition-all flex items-center gap-2"
+          >
+            <span>Open My Study Planner</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
+            </svg>
+          </a>
+        }
+        <a
+          href="#prepare-test"
+          class="px-8 py-3.5 text-base font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/25 rounded-xl backdrop-blur-md transition-all"
+        >
+          Explore Your Exam
+        </a>
+      </div>
+
+      <!-- Popular Exam Pills -->
+      <div class="mt-12 pt-8 border-t border-white/15">
+        <p class="text-xs uppercase tracking-widest text-blue-200 mb-4 font-semibold">
+          Popular Competitive Exams Supported
+        </p>
+        <div class="flex flex-wrap justify-center gap-2.5">
+          @for (exam of exams; track exam.name) {
+            <button
+              type="button"
+              (click)="selectExamSearch(exam.name)"
+              class="px-4 py-2 rounded-full bg-white/10 hover:bg-[#315FEA] border border-white/20 text-sm font-medium text-white transition-all cursor-pointer"
+            >
+              {{ exam.name }}
+              <span class="text-xs text-blue-200 ml-1">• {{ exam.category }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- LOGGED-IN STUDENT INTELLIGENCE STRIP                      -->
+  <!-- ========================================================= -->
+  @if (currentUser()) {
+    <section
+      class="py-6 bg-gradient-to-r from-[#172F61] via-[#1e3a78] to-[#315FEA] text-white border-y border-blue-900 shadow-md"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div class="flex items-center gap-4">
+            <div
+              class="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur border border-white/25 flex items-center justify-center text-2xl font-black text-white shadow-lg"
+            >
+              {{ currentUser()?.name?.charAt(0)?.toUpperCase() || 'S' }}
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-400 text-slate-900"
+                >
+                  Active Student
+                </span>
+                <span class="text-xs text-blue-200">{{ currentUser()?.email }}</span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-black mt-0.5">
+                Welcome back, {{ currentUser()?.name }}!
+              </h2>
+              <p class="text-xs sm:text-sm text-blue-100/90 mt-0.5">
+                Your live preparation metrics are synchronized across all modules.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto">
+            <div
+              class="bg-white/10 backdrop-blur rounded-2xl p-3.5 border border-white/15 text-center"
+            >
+              <span class="text-[11px] font-bold text-blue-200 uppercase tracking-wider block"
+                >Readiness</span
+              >
+              <strong class="text-xl sm:text-2xl font-black text-amber-300">
+                {{ studentAnalytics()?.readinessIndex ?? 78 }}%
+              </strong>
+            </div>
+            <div
+              class="bg-white/10 backdrop-blur rounded-2xl p-3.5 border border-white/15 text-center"
+            >
+              <span class="text-[11px] font-bold text-blue-200 uppercase tracking-wider block"
+                >Mock Tests</span
+              >
+              <strong class="text-xl sm:text-2xl font-black text-white">
+                {{ studentAnalytics()?.totalTestsAttempted ?? 0 }}
+              </strong>
+            </div>
+            <div
+              class="bg-white/10 backdrop-blur rounded-2xl p-3.5 border border-white/15 text-center"
+            >
+              <span class="text-[11px] font-bold text-blue-200 uppercase tracking-wider block"
+                >Avg Accuracy</span
+              >
+              <strong class="text-xl sm:text-2xl font-black text-emerald-300">
+                {{ studentAnalytics()?.averageAccuracy ?? 0 }}%
+              </strong>
+            </div>
+            <div
+              class="bg-white/10 backdrop-blur rounded-2xl p-3.5 border border-white/15 text-center"
+            >
+              <span class="text-[11px] font-bold text-blue-200 uppercase tracking-wider block"
+                >Qs Solved</span
+              >
+              <strong class="text-xl sm:text-2xl font-black text-white">
+                {{ studentAnalytics()?.totalQuestionsSolved ?? 0 }}
+              </strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ========================================================= -->
+  <!-- WHO WE ARE & GUIDING PURPOSE                              -->
+  <!-- ========================================================= -->
+  <section id="who-we-are" class="py-20 bg-[#F4F7FE] border-b border-slate-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-7 space-y-5">
+          <span
+            class="inline-block text-xs font-bold uppercase tracking-wider text-[#315FEA] bg-[#315FEA]/10 px-3 py-1 rounded-full"
+          >
+            Who We Are
+          </span>
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#172F61] leading-tight">
+            Reimagining How Students Prepare for Competitive Examinations
+          </h2>
+          <p class="text-slate-600 text-base sm:text-lg leading-relaxed">
+            <strong class="text-[#172F61] font-semibold">ExamSphere AI</strong> is a smart,
+            technology-driven educational platform built to simplify competitive examination
+            preparation for students across
+            <span class="text-[#315FEA] font-medium">
+              national, state, university, and international
+            </span>
+            levels.
+          </p>
+          <p class="text-slate-600 text-base leading-relaxed">
+            Instead of depending on dozens of disconnected websites and scattered PDFs, students can
+            discover examinations, understand their syllabus, practice verified PYQs, attempt
+            realistic mock tests, and receive personalized AI-powered guidance in one unified
+            workspace.
+          </p>
+        </div>
+
+        <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm">
+            <div
+              class="w-11 h-11 rounded-xl bg-[#315FEA] text-white flex items-center justify-center mb-4"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3"
+                />
+              </svg>
+            </div>
+            <h3 class="font-bold text-lg text-[#172F61]">1 Unified Hub</h3>
+            <p class="text-sm text-slate-600 mt-1.5 leading-relaxed">
+              Replaces fragmented portals with a single organized study workspace.
+            </p>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm">
+            <div
+              class="w-11 h-11 rounded-xl bg-purple-600 text-white flex items-center justify-center mb-4"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3"
+                />
+              </svg>
+            </div>
+            <h3 class="font-bold text-lg text-[#172F61]">4 Exam Tiers</h3>
+            <p class="text-sm text-slate-600 mt-1.5 leading-relaxed">
+              Built for National, State, University, and International tracks.
+            </p>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm">
+            <div
+              class="w-11 h-11 rounded-xl bg-[#172F61] text-white flex items-center justify-center mb-4"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0"
+                />
+              </svg>
+            </div>
+            <h3 class="font-bold text-lg text-[#172F61]">AI-First Prep</h3>
+            <p class="text-sm text-slate-600 mt-1.5 leading-relaxed">
+              Adaptive tutoring, smart revision sheets, and dynamic timetables.
+            </p>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm">
+            <div
+              class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center mb-4"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"
+                />
+              </svg>
+            </div>
+            <h3 class="font-bold text-lg text-[#172F61]">10+ Core Tools</h3>
+            <p class="text-sm text-slate-600 mt-1.5 leading-relaxed">
+              End-to-end learning toolkit from syllabus discovery to mock analytics.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- HOW EXAMSHERE AI WORKS (PLATFORM WORK STRUCTURE)          -->
+  <!-- ========================================================= -->
+  <section id="work-structure" class="py-20 bg-white border-b border-slate-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span
+          class="inline-block text-xs font-bold uppercase tracking-wider text-[#315FEA] bg-[#315FEA]/10 px-3 py-1 rounded-full mb-3"
+        >
+          End-to-End Learning Architecture
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-[#172F61]">How ExamSphere AI Works</h2>
+        <p class="mt-3 text-slate-600 text-base sm:text-lg">
+          A structured 5-stage preparation pipeline engineered to take you from syllabus discovery
+          to exam-day peak accuracy.
+        </p>
+      </div>
+
+      <!-- 5-Step Connected Pipeline Grid -->
+      <div class="relative">
+        <!-- Desktop Horizontal Connector Line -->
+        <div
+          class="hidden lg:block absolute top-14 left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-blue-200 via-[#315FEA] to-emerald-400 z-0"
+        ></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 relative z-10">
+          <!-- Step 01 -->
+          <div
+            class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200/90 hover:border-[#315FEA] shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 flex flex-col justify-between"
+          >
+            <div>
+              <div class="flex items-center justify-between mb-5">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-[#172F61] group-hover:bg-[#315FEA] text-white flex items-center justify-center shadow-md transition-colors"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                <span
+                  class="text-xs font-black tracking-wider uppercase px-2.5 py-1 rounded-full bg-blue-100 text-[#172F61]"
+                >
+                  Stage 01
+                </span>
+              </div>
+
+              <h3
+                class="text-lg font-extrabold text-[#172F61] group-hover:text-[#315FEA] transition-colors"
+              >
+                Select Target Exam
+              </h3>
+              <p class="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Pick one or multiple exams (JEE, NEET, UPSC, GATE, CAT, SSC) to initialize a
+                dedicated workspace with official patterns and eligibility rules.
+              </p>
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-slate-200/70">
+              <span class="text-[11px] font-bold text-[#315FEA]">
+                Output: Custom Exam Workspace
+              </span>
+            </div>
+          </div>
+
+          <!-- Step 02 -->
+          <div
+            class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200/90 hover:border-[#315FEA] shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 flex flex-col justify-between"
+          >
+            <div>
+              <div class="flex items-center justify-between mb-5">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-[#172F61] group-hover:bg-[#315FEA] text-white flex items-center justify-center shadow-md transition-colors"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <span
+                  class="text-xs font-black tracking-wider uppercase px-2.5 py-1 rounded-full bg-blue-100 text-[#172F61]"
+                >
+                  Stage 02
+                </span>
+              </div>
+
+              <h3
+                class="text-lg font-extrabold text-[#172F61] group-hover:text-[#315FEA] transition-colors"
+              >
+                AI Roadmap & Syllabus
+              </h3>
+              <p class="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Explore weightage-ranked topics and generate an adaptive daily study timetable that
+                auto-adjusts whenever you miss a target.
+              </p>
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-slate-200/70">
+              <span class="text-[11px] font-bold text-[#315FEA]">
+                Output: Dynamic Study Schedule
+              </span>
+            </div>
+          </div>
+
+          <!-- Step 03 -->
+          <div
+            class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200/90 hover:border-[#315FEA] shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 flex flex-col justify-between"
+          >
+            <div>
+              <div class="flex items-center justify-between mb-5">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-[#172F61] group-hover:bg-[#315FEA] text-white flex items-center justify-center shadow-md transition-colors"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    />
+                  </svg>
+                </div>
+                <span
+                  class="text-xs font-black tracking-wider uppercase px-2.5 py-1 rounded-full bg-blue-100 text-[#172F61]"
+                >
+                  Stage 03
+                </span>
+              </div>
+
+              <h3
+                class="text-lg font-extrabold text-[#172F61] group-hover:text-[#315FEA] transition-colors"
+              >
+                Learn & Solve Doubts
+              </h3>
+              <p class="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Study AI-condensed notes, formula sheets, and mind maps while resolving concept
+                doubts 24/7 with the ExamSphere AI Personal Tutor.
+              </p>
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-slate-200/70">
+              <span class="text-[11px] font-bold text-[#315FEA]">
+                Output: Instant Concept Clarity
+              </span>
+            </div>
+          </div>
+
+          <!-- Step 04 -->
+          <div
+            class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200/90 hover:border-[#315FEA] shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 flex flex-col justify-between"
+          >
+            <div>
+              <div class="flex items-center justify-between mb-5">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-[#172F61] group-hover:bg-[#315FEA] text-white flex items-center justify-center shadow-md transition-colors"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <span
+                  class="text-xs font-black tracking-wider uppercase px-2.5 py-1 rounded-full bg-blue-100 text-[#172F61]"
+                >
+                  Stage 04
+                </span>
+              </div>
+
+              <h3
+                class="text-lg font-extrabold text-[#172F61] group-hover:text-[#315FEA] transition-colors"
+              >
+                PYQs & Adaptive Mocks
+              </h3>
+              <p class="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Practice 15+ years of chapter-wise Previous Year Questions, daily challenges, and
+                real CBT-interface mock tests calibrated to exam difficulty.
+              </p>
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-slate-200/70">
+              <span class="text-[11px] font-bold text-[#315FEA]">
+                Output: Real-Exam Speed & Stamina
+              </span>
+            </div>
+          </div>
+
+          <!-- Step 05 -->
+          <div
+            class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200/90 hover:border-emerald-500 shadow-sm hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300 flex flex-col justify-between"
+          >
+            <div>
+              <div class="flex items-center justify-between mb-5">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md transition-colors"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                    />
+                  </svg>
+                </div>
+                <span
+                  class="text-xs font-black tracking-wider uppercase px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800"
+                >
+                  Stage 05
+                </span>
+              </div>
+
+              <h3
+                class="text-lg font-extrabold text-[#172F61] group-hover:text-emerald-700 transition-colors"
+              >
+                Heatmap & AI Recovery
+              </h3>
+              <p class="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Track your Readiness Index and topic-level accuracy heatmap while AI auto-builds
+                targeted recovery drills for every red-zone chapter.
+              </p>
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-slate-200/70">
+              <span class="text-[11px] font-bold text-emerald-700">
+                Output: Continuous Rank Improvement
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Continuous Feedback Loop Banner -->
+      <div
+        class="mt-12 rounded-2xl bg-gradient-to-r from-[#172F61] to-[#315FEA] p-6 sm:p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg shadow-blue-950/15"
+      >
+        <div class="flex items-start sm:items-center gap-4">
+          <div
+            class="w-12 h-12 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center shrink-0"
+          >
+            <svg
+              class="w-6 h-6 text-amber-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-base sm:text-lg font-extrabold">Closed-Loop AI Learning Cycle</h4>
+            <p class="text-xs sm:text-sm text-blue-100 mt-1">
+              Every mock test and daily quiz updates your Topic Heatmap, automatically feeding new
+              weak-topic drills back into your AI Study Planner.
+            </p>
+          </div>
+        </div>
+
+        <a
+          routerLink="/features"
+          class="px-6 py-3 rounded-xl bg-white text-[#172F61] hover:bg-blue-50 text-xs sm:text-sm font-extrabold transition-colors shrink-0 shadow"
+        >
+          Launch Your Workflow →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- SECTION A: PREPARE YOUR TEST FROM TODAY (EXAM CATALOG)    -->
+  <!-- ========================================================= -->
+  <section id="prepare-test" class="py-20 bg-slate-50 border-b border-slate-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto mb-10">
+        <span
+          class="inline-block text-xs font-bold uppercase tracking-wider text-[#315FEA] bg-[#315FEA]/10 px-3 py-1 rounded-full mb-3"
+        >
+          Target Your Goal
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-[#172F61]">
+          Prepare Your Test From Today
+        </h2>
+        <p class="mt-3 text-slate-600 text-base sm:text-lg">
+          Search across national and state-level competitive exams and launch your personalized test
+          workspace immediately.
+        </p>
+      </div>
+
+      <!-- Interactive Search & Filter Bar -->
+      <div class="max-w-2xl mx-auto mb-12">
+        <div
+          class="relative flex items-center bg-white rounded-2xl border border-slate-200 shadow-sm focus-within:border-[#315FEA] focus-within:ring-4 focus-within:ring-[#315FEA]/10 transition-all"
+        >
+          <svg
+            class="w-5 h-5 text-slate-400 ml-4 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <input
+            type="text"
+            [ngModel]="examSearchQuery()"
+            (ngModelChange)="examSearchQuery.set($event)"
+            placeholder="Search by exam name, category, or conducting body (e.g., JEE, NEET, UPSC, NTA)..."
+            class="w-full px-4 py-3.5 text-sm sm:text-base text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none"
+          />
+          @if (examSearchQuery()) {
+            <button
+              type="button"
+              (click)="examSearchQuery.set('')"
+              class="mr-3 px-3 py-1 text-xs font-semibold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+            >
+              Clear
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Exam Cards Grid -->
+      @if (filteredExamCatalog().length > 0) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          @for (item of filteredExamCatalog(); track item.name) {
+            <div
+              (click)="startExamPreparation(item)"
+              class="group bg-white rounded-2xl p-6 border border-slate-200/90 hover:border-[#315FEA] shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between text-center cursor-pointer"
+            >
+              <div class="flex flex-col items-center">
+                <!-- Exam Logo -->
+                <div
+                  class="w-20 h-20 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-center p-3 mb-4 group-hover:scale-105 group-hover:border-blue-200 transition-transform duration-200 overflow-hidden"
+                >
+                  <img
+                    [src]="
+                      item.imageurl || 'https://cdn-icons-png.flaticon.com/512/3135/3135755.png'
+                    "
+                    [alt]="item.name + ' Logo'"
+                    class="w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
+
+                <!-- Category Pill -->
+                <span
+                  class="text-[11px] font-bold uppercase tracking-wide text-[#315FEA] bg-blue-50 px-2.5 py-0.5 rounded-full mb-2"
+                >
+                  {{ item.category }}
+                </span>
+
+                <!-- Exam Name -->
+                <h3
+                  class="text-lg font-extrabold text-[#172F61] group-hover:text-[#315FEA] transition-colors"
+                >
+                  {{ item.name }}
+                </h3>
+
+                <p class="text-xs text-slate-500 mt-1">{{ item.conductingBody }}</p>
+                <p class="text-xs text-slate-600 mt-3 line-clamp-2 leading-relaxed">
+                  {{ item.overview }}
+                </p>
+              </div>
+
+              <!-- Meta & Actions -->
+              <div class="mt-5 w-full pt-4 border-t border-slate-100 flex flex-col gap-2.5">
+                <div class="flex items-center justify-between text-[11px] text-slate-500 px-1">
+                  <span class="truncate max-w-[55%]" [title]="item.pattern">{{
+                    item.pattern
+                  }}</span>
+                  <span class="font-semibold text-slate-700">{{ item.nextSession }}</span>
+                </div>
+
+                <button
+                  type="button"
+                  (click)="startExamPreparation(item, $event)"
+                  class="w-full py-2.5 px-4 text-xs sm:text-sm font-bold text-white bg-[#315FEA] hover:bg-blue-700 rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5"
+                >
+                  <span>Start Preparation</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    />
+                  </svg>
+                </button>
+                <a
+                  routerLink="/syllabus"
+                  (click)="$event.stopPropagation()"
+                  class="text-xs font-semibold text-slate-500 hover:text-[#315FEA] transition-colors"
+                >
+                  View Syllabus & Pattern →
+                </a>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div
+          class="text-center py-12 bg-white rounded-2xl border border-slate-200 max-w-xl mx-auto"
+        >
+          <p class="text-slate-700 font-semibold">No exams matched "{{ examSearchQuery() }}".</p>
+          <button
+            type="button"
+            (click)="examSearchQuery.set('')"
+            class="mt-3 px-4 py-2 text-xs font-bold text-white bg-[#315FEA] rounded-xl"
+          >
+            Reset Filter
+          </button>
+        </div>
+      }
+
+      <!-- Explore More Exams CTA -->
+      <div class="mt-12 text-center">
+        <a
+          routerLink="/explore-exams"
+          class="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 text-sm sm:text-base font-bold text-white bg-[#172F61] hover:bg-[#315FEA] rounded-2xl shadow-md transition-all duration-200"
+        >
+          <span>Explore All 50+ Competitive Exams</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 8l4 4m0 0l-4 4m4-4H3"
+            />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- SECTION B: EXAM SPHERE AI MENTOR (DOUBT SOLVER)           -->
+  <!-- ========================================================= -->
+  <section id="ai-mentor" class="py-20 bg-white border-b border-slate-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <!-- Left Description -->
+        <div class="lg:col-span-5">
+          <span
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-[#315FEA] border border-blue-200"
+          >
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            24/7 AI Mentor Online
+          </span>
+          <h2 class="mt-3 text-3xl sm:text-4xl font-extrabold text-[#172F61] leading-tight">
+            Stuck on a Concept? Ask ExamSphere AI Mentor
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Get instant step-by-step derivations, memory tricks, balanced chemical reactions, and
+            exam strategy tailored to your target syllabus.
+          </p>
+
+          <div class="mt-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+              Try a Quick Doubt Prompt:
+            </p>
+            <div class="flex flex-wrap gap-2">
+              @for (prompt of quickPrompts; track prompt) {
+                <button
+                  type="button"
+                  (click)="selectPrompt(prompt)"
+                  [disabled]="isAiLoading()"
+                  class="text-left text-xs font-medium px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-[#315FEA] border border-slate-200 hover:border-blue-300 transition-all disabled:opacity-50"
+                >
+                  {{ prompt }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Interactive AI Mentor Console -->
+        <div class="lg:col-span-7">
+          <div
+            class="rounded-3xl bg-slate-900 text-white p-6 sm:p-8 shadow-2xl shadow-blue-950/15 border border-slate-800"
+          >
+            <!-- Console Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-10 h-10 rounded-xl bg-[#315FEA] flex items-center justify-center font-extrabold text-white"
+                >
+                  AI
+                </div>
+                <div>
+                  <h3 class="font-bold text-base text-white">ExamSphere Personal Mentor</h3>
+                  <p class="text-xs text-blue-300">Trained on NCERT, JEE, NEET & UPSC Archives</p>
+                </div>
+              </div>
+              <span
+                class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold"
+              >
+                {{ isAiLoading() ? 'Thinking...' : 'Instant Solver' }}
+              </span>
+            </div>
+
+            <!-- Conversation Feed -->
+            <div class="my-6 space-y-4 max-h-80 overflow-y-auto pr-1">
+              @for (msg of mentorMessages(); track $index) {
+                <div [class.text-right]="msg.sender === 'student'">
+                  <div
+                    class="inline-block max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed text-left"
+                    [class.bg-[#315FEA]]="msg.sender === 'student'"
+                    [class.text-white]="msg.sender === 'student'"
+                    [class.bg-slate-800]="msg.sender === 'ai'"
+                    [class.text-slate-100]="msg.sender === 'ai'"
+                    [class.border]="msg.sender === 'ai'"
+                    [class.border-slate-700]="msg.sender === 'ai'"
+                  >
+                    <span
+                      class="block text-[11px] font-bold uppercase tracking-wider mb-1 opacity-75"
+                    >
+                      {{ msg.sender === 'student' ? 'You' : 'ExamSphere AI Mentor' }}
+                    </span>
+                    <p class="whitespace-pre-line">{{ msg.text }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Input Form -->
+            <form
+              (ngSubmit)="submitAiquery()"
+              class="flex items-center gap-2 bg-slate-800 p-2 rounded-2xl border border-slate-700 focus-within:border-[#315FEA]"
+            >
+              <input
+                type="text"
+                name="aiQueryInput"
+                [ngModel]="aiQuery()"
+                (ngModelChange)="aiQuery.set($event)"
+                placeholder="Type your physics, chemistry, math, or strategy doubt..."
+                class="flex-1 bg-transparent px-3 py-2 text-sm text-white placeholder-slate-400 focus:outline-none"
+              />
+              <button
+                type="submit"
+                [disabled]="isAiLoading() || !aiQuery().trim()"
+                class="px-5 py-2.5 rounded-xl bg-[#315FEA] hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-bold transition-colors shrink-0"
+              >
+                {{ isAiLoading() ? 'Solving...' : 'Solve Now' }}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- SECTION C: WEAKNESS & STRENGTH TOPIC HEATMAP              -->
+  <!-- ========================================================= -->
+  <section class="py-20 bg-gradient-to-b from-blue-50/60 to-slate-50 border-b border-slate-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+        <div>
+          <span
+            class="inline-block text-xs font-bold uppercase tracking-wider text-[#315FEA] bg-[#315FEA]/10 px-3 py-1 rounded-full mb-2"
+            >Diagnostic Intelligence</span
+          >
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-[#172F61]">
+            Weakness & Strength Topic Heatmap
+          </h2>
+          <p class="mt-2 text-slate-600 max-w-2xl">
+            See how ExamSphere AI maps your chapter-level accuracy in real time and automatically
+            generates targeted recovery drills for red zones.
+          </p>
+        </div>
+
+        <!-- Subject Selector Tabs -->
+        <div class="flex flex-wrap gap-2">
+          @for (subject of heatmapSubjects; track subject) {
+            <button
+              type="button"
+              (click)="selectedHeatmapSubject.set(subject)"
+              class="px-4 py-2 rounded-xl text-sm font-bold transition-all"
+              [class.bg-[#315FEA]]="selectedHeatmapSubject() === subject"
+              [class.text-white]="selectedHeatmapSubject() === subject"
+              [class.shadow-md]="selectedHeatmapSubject() === subject"
+              [class.bg-white]="selectedHeatmapSubject() !== subject"
+              [class.text-slate-700]="selectedHeatmapSubject() !== subject"
+              [class.border]="selectedHeatmapSubject() !== subject"
+              [class.border-slate-200]="selectedHeatmapSubject() !== subject"
+            >
+              {{ subject }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Heatmap Legend -->
+      <div
+        class="flex flex-wrap items-center gap-6 mb-8 text-xs font-semibold text-slate-600 bg-white px-5 py-3 rounded-2xl border border-slate-200/80 w-fit"
+      >
+        <span class="flex items-center gap-2"
+          ><span class="w-3 h-3 rounded-sm bg-emerald-500"></span> Strong (&ge; 80%)</span
+        >
+        <span class="flex items-center gap-2"
+          ><span class="w-3 h-3 rounded-sm bg-amber-400"></span> Moderate (60% – 79%)</span
+        >
+        <span class="flex items-center gap-2"
+          ><span class="w-3 h-3 rounded-sm bg-rose-500"></span> Critical Weakness (&lt; 60%)</span
+        >
+      </div>
+
+      <!-- Heatmap Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        @for (cell of activeHeatmapTopics(); track cell.topic) {
+          <div
+            class="p-5 rounded-2xl border transition-all flex flex-col justify-between bg-white shadow-sm hover:shadow-md"
+            [class.border-emerald-200]="cell.accuracy >= 80"
+            [class.border-amber-200]="cell.accuracy >= 60 && cell.accuracy < 80"
+            [class.border-rose-300]="cell.accuracy < 60"
+          >
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span
+                  class="px-2.5 py-0.5 text-xs font-bold rounded-full"
+                  [class.bg-emerald-100]="cell.accuracy >= 80"
+                  [class.text-emerald-800]="cell.accuracy >= 80"
+                  [class.bg-amber-100]="cell.accuracy >= 60 && cell.accuracy < 80"
+                  [class.text-amber-800]="cell.accuracy >= 60 && cell.accuracy < 80"
+                  [class.bg-rose-100]="cell.accuracy < 60"
+                  [class.text-rose-800]="cell.accuracy < 60"
+                >
+                  {{ cell.status }}
+                </span>
+                <span class="text-xs font-semibold text-slate-400"
+                  >{{ cell.weightage }} Weightage</span
+                >
+              </div>
+
+              <h3 class="text-base font-bold text-[#172F61]">{{ cell.topic }}</h3>
+              <p class="text-xs text-slate-500 mt-1">
+                {{ cell.questionsAttempted }} PYQs & Mock Qs solved
+              </p>
+
+              <!-- Accuracy Bar -->
+              <div class="mt-4">
+                <div class="flex justify-between text-xs font-bold mb-1">
+                  <span class="text-slate-600">Accuracy</span>
+                  <span
+                    [class.text-emerald-600]="cell.accuracy >= 80"
+                    [class.text-amber-600]="cell.accuracy >= 60 && cell.accuracy < 80"
+                    [class.text-rose-600]="cell.accuracy < 60"
+                  >
+                    {{ cell.accuracy }}%
+                  </span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    class="h-full rounded-full transition-all duration-500"
+                    [style.width.%]="cell.accuracy"
+                    [class.bg-emerald-500]="cell.accuracy >= 80"
+                    [class.bg-amber-400]="cell.accuracy >= 60 && cell.accuracy < 80"
+                    [class.bg-rose-500]="cell.accuracy < 60"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              (click)="practiceTopicWithAI(cell.topic)"
+              class="mt-5 w-full py-2.5 px-3 rounded-xl text-xs font-bold transition-colors"
+              [class.bg-rose-600]="cell.accuracy < 60"
+              [class.hover:bg-rose-700]="cell.accuracy < 60"
+              [class.text-white]="cell.accuracy < 60"
+              [class.bg-slate-100]="cell.accuracy >= 60"
+              [class.hover:bg-[#315FEA]]="cell.accuracy >= 60"
+              [class.text-slate-700]="cell.accuracy >= 60"
+              [class.hover:text-white]="cell.accuracy >= 60"
+            >
+              {{ cell.accuracy < 60 ? 'Fix Weak Topic with AI →' : 'Boost Speed Drill →' }}
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- SECTION D: QUIZ OF THE DAY / DAILY CHALLENGE              -->
+  <!-- ========================================================= -->
+ 
+  <!-- ========================================================= -->
+  <!-- SECTION 2: 10 SMART WEBSITE FEATURES                      -->
+  <!-- ========================================================= -->
+  <section class="py-20 bg-slate-50 border-b border-slate-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span
+          class="inline-block text-xs font-bold uppercase tracking-wider text-[#315FEA] bg-[#315FEA]/10 px-3 py-1 rounded-full mb-2"
+          >Powerful AI Ecosystem</span
+        >
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-[#172F61]">
+          Everything You Need to Crack Your Dream Exam
+        </h2>
+        <p class="mt-4 text-slate-600 text-base sm:text-lg">
+          Ten intelligent tools working together to turn weak topics into your highest-scoring
+          strengths.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        @for (item of features; track item.id) {
+          <div
+            class="group p-6 rounded-2xl bg-white border border-slate-200/90 hover:border-[#315FEA] shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 flex flex-col justify-between"
+          >
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div
+                  class="w-12 h-12 rounded-xl bg-blue-50 text-[#315FEA] group-hover:bg-[#315FEA] group-hover:text-white flex items-center justify-center transition-colors"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      [attr.d]="item.icon"
+                    ></path>
+                  </svg>
+                </div>
+                <span class="text-xs font-bold text-[#315FEA] bg-blue-50 px-2.5 py-1 rounded-full">
+                  {{ item.id < 10 ? '0' + item.id : item.id }}
+                </span>
+              </div>
+              <h3
+                class="text-base font-bold text-[#172F61] group-hover:text-[#315FEA] transition-colors"
+              >
+                {{ item.title }}
+              </h3>
+              <p class="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                {{ item.description }}
+              </p>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-100">
+              <a
+                [routerLink]="item.route || '/features'"
+                class="text-xs font-bold text-[#315FEA] hover:text-[#172F61] flex items-center justify-between"
+              >
+                <span>Explore Tool</span>
+                <span>→</span>
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- SECTION 3: WHY EXAM SPHERE AI IS BETTER THAN OTHERS       -->
+  <!-- ========================================================= -->
+  <section class="py-20 bg-white border-b border-slate-200/80">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <span
+          class="inline-block text-xs font-bold uppercase tracking-wider text-[#315FEA] bg-[#315FEA]/10 px-3 py-1 rounded-full mb-2"
+          >The ExamSphere Advantage</span
+        >
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-[#172F61]">
+          Why Students Choose ExamSphere AI Over Traditional Portals
+        </h2>
+      </div>
+
+      <div
+        class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50"
+      >
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-[#172F61] text-white">
+              <th class="py-4 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider">
+                Capability
+              </th>
+              <th
+                class="py-4 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider text-blue-200"
+              >
+                Other Websites
+              </th>
+              <th
+                class="py-4 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider bg-[#315FEA]"
+              >
+                ExamSphere AI
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            @for (row of comparisons; track row.feature) {
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="py-4 px-6 font-bold text-[#172F61] text-sm">{{ row.feature }}</td>
+                <td class="py-4 px-6 text-slate-500 text-sm">✕ {{ row.others }}</td>
+                <td class="py-4 px-6 text-[#315FEA] font-semibold text-sm bg-blue-50/40">
+                  ✓ {{ row.examsphere }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- OUR CORE PRINCIPLES                                       -->
+  <!-- ========================================================= -->
+  <section id="core-principles" class="py-20 bg-[#F4F7FE] border-b border-slate-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span
+          class="inline-block text-xs font-bold uppercase tracking-wider text-[#315FEA] bg-[#315FEA]/10 px-3 py-1 rounded-full mb-3"
+        >
+          What Guides Us
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-[#172F61]">Our Core Principles</h2>
+        <p class="mt-3 text-slate-600 text-base sm:text-lg">
+          Six foundational commitments that govern how we design AI tutoring, curate exam content,
+          and measure student progress.
+        </p>
+      </div>
+
+      <!-- 6-Card Principles Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Principle 01 -->
+        <div
+          class="group bg-white rounded-2xl p-7 border border-slate-200/90 hover:border-[#315FEA] shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-5">
+              <div
+                class="w-12 h-12 rounded-2xl bg-[#315FEA]/10 text-[#315FEA] group-hover:bg-[#315FEA] group-hover:text-white flex items-center justify-center transition-colors"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+              </div>
+              <span
+                class="text-xs font-black tracking-widest text-slate-300 group-hover:text-[#315FEA] transition-colors"
+              >
+                01
+              </span>
+            </div>
+            <h3 class="text-lg font-extrabold text-[#172F61] mb-2">
+              Clarity Over Rote Memorization
+            </h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              Every AI explanation breaks problems down into first principles, step-by-step logic,
+              and visual intuition—so you master concepts rather than memorizing answers.
+            </p>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-100">
+            <span class="text-xs font-bold text-[#315FEA]">Pedagogy First</span>
+          </div>
+        </div>
+
+        <!-- Principle 02 -->
+        <div
+          class="group bg-white rounded-2xl p-7 border border-slate-200/90 hover:border-[#315FEA] shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-5">
+              <div
+                class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white flex items-center justify-center transition-colors"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
+              </div>
+              <span
+                class="text-xs font-black tracking-widest text-slate-300 group-hover:text-emerald-600 transition-colors"
+              >
+                02
+              </span>
+            </div>
+            <h3 class="text-lg font-extrabold text-[#172F61] mb-2">
+              Syllabus & PYQ Grounded Accuracy
+            </h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              Our AI models, mock tests, and notes are strictly anchored to official NTA, UPSC,
+              GATE, and university syllabi—eliminating off-topic noise and unverified shortcuts.
+            </p>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-100">
+            <span class="text-xs font-bold text-emerald-600">Verified Content</span>
+          </div>
+        </div>
+
+        <!-- Principle 03 -->
+        <div
+          class="group bg-white rounded-2xl p-7 border border-slate-200/90 hover:border-[#315FEA] shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-5">
+              <div
+                class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center transition-colors"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+              </div>
+              <span
+                class="text-xs font-black tracking-widest text-slate-300 group-hover:text-purple-600 transition-colors"
+              >
+                03
+              </span>
+            </div>
+            <h3 class="text-lg font-extrabold text-[#172F61] mb-2">Adaptive Personalization</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              No two aspirants share the same weak spots. Your study timetable, mock difficulty, and
+              recovery drills dynamically adapt to your real-time accuracy and speed.
+            </p>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-100">
+            <span class="text-xs font-bold text-purple-600">Tailored to You</span>
+          </div>
+        </div>
+
+        <!-- Principle 04 -->
+        <div
+          class="group bg-white rounded-2xl p-7 border border-slate-200/90 hover:border-[#315FEA] shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-5">
+              <div
+                class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 group-hover:bg-amber-500 group-hover:text-white flex items-center justify-center transition-colors"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+              </div>
+              <span
+                class="text-xs font-black tracking-widest text-slate-300 group-hover:text-amber-600 transition-colors"
+              >
+                04
+              </span>
+            </div>
+            <h3 class="text-lg font-extrabold text-[#172F61] mb-2">Evidence-Driven Progress</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              Replace guesswork with transparent diagnostics. Chapter-level heatmaps,
+              time-per-question metrics, and readiness scores show exactly where your next 20 marks
+              will come from.
+            </p>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-100">
+            <span class="text-xs font-bold text-amber-600">Actionable Analytics</span>
+          </div>
+        </div>
+
+        <!-- Principle 05 -->
+        <div
+          class="group bg-white rounded-2xl p-7 border border-slate-200/90 hover:border-[#315FEA] shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-5">
+              <div
+                class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center transition-colors"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <span
+                class="text-xs font-black tracking-widest text-slate-300 group-hover:text-sky-600 transition-colors"
+              >
+                05
+              </span>
+            </div>
+            <h3 class="text-lg font-extrabold text-[#172F61] mb-2">
+              Equal Access for Every Aspirant
+            </h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              High-quality mentorship shouldn't depend on city or budget. Essential syllabi, PYQs,
+              daily challenges, and AI guidance remain accessible from any device, anywhere.
+            </p>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-100">
+            <span class="text-xs font-bold text-sky-600">Inclusive by Design</span>
+          </div>
+        </div>
+
+        <!-- Principle 06 -->
+        <div
+          class="group bg-white rounded-2xl p-7 border border-slate-200/90 hover:border-[#315FEA] shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-5">
+              <div
+                class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white flex items-center justify-center transition-colors"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+              </div>
+              <span
+                class="text-xs font-black tracking-widest text-slate-300 group-hover:text-rose-600 transition-colors"
+              >
+                06
+              </span>
+            </div>
+            <h3 class="text-lg font-extrabold text-[#172F61] mb-2">
+              Distraction-Free & Privacy-Safe
+            </h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              Zero intrusive ads, zero selling of student performance data, and a clean unified
+              workspace built strictly to protect your focus during peak exam months.
+            </p>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-100">
+            <span class="text-xs font-bold text-rose-600">Student Trust</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- OUR TEAM MEMBERS (WITH LINKEDIN & GITHUB PROFILES)        -->
+  <!-- ========================================================= -->
+  <section id="our-team" class="py-20 bg-white border-b border-slate-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span
+          class="inline-block text-xs font-bold uppercase tracking-wider text-[#315FEA] bg-[#315FEA]/10 px-3 py-1 rounded-full mb-3"
+        >
+          The Builders Behind ExamSphere AI
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-[#172F61]">Meet Our Team</h2>
+        <p class="mt-3 text-slate-600 text-base sm:text-lg">
+          A dedicated team of engineers, educators, and AI researchers working to make competitive
+          exam preparation smarter and accessible for every student.
+        </p>
+      </div>
+
+      <!-- Team Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        @for (member of teamMembers; track member.name) {
+          <div
+            class="group bg-slate-50 hover:bg-white rounded-3xl overflow-hidden border border-slate-200/90 hover:border-[#315FEA] shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+          >
+            <div>
+              <!-- Member Image Container -->
+              <div class="relative h-64 w-full overflow-hidden bg-slate-200">
+                <img
+                  [src]="member.imageUrl"
+                  [alt]="member.name + ' - ' + member.role"
+                  class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-[#172F61]/80 via-transparent to-transparent opacity-60 group-hover:opacity-75 transition-opacity"
+                ></div>
+
+                <!-- Department Tag -->
+                <span
+                  class="absolute top-3.5 left-3.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-white/95 text-[#172F61] shadow-sm"
+                >
+                  {{ member.department }}
+                </span>
+
+                <!-- Quick Floating Social Buttons -->
+                <!-- <div class="absolute bottom-3.5 right-3.5 flex items-center gap-2">
+                  @if (member.githubUrl) {
+                    <a
+                      [href]="member.githubUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      [attr.aria-label]="'View ' + member.name + ' on GitHub'"
+                      class="w-10 h-10 rounded-xl bg-slate-900 hover:bg-black text-white flex items-center justify-center shadow-lg transition-transform hover:scale-105"
+                    >
+                      <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path
+                          d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                        />
+                      </svg>
+                    </a>
+                  }
+
+                  @if (member.linkedinUrl) {
+                    <a
+                      [href]="member.linkedinUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      [attr.aria-label]="'Connect with ' + member.name + ' on LinkedIn'"
+                      class="w-10 h-10 rounded-xl bg-[#0A66C2] hover:bg-[#004182] text-white flex items-center justify-center shadow-lg transition-transform hover:scale-105"
+                    >
+                      <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path
+                          d="M19 3A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3H19M18.5 18.5V13.2A3.26 3.26 0 0 0 15.24 9.94C14.39 9.94 13.4 10.46 12.92 11.24V10.13H10.13V18.5H12.92V13.57C12.92 12.8 13.54 12.17 14.31 12.17A1.4 1.4 0 0 1 15.71 13.57V18.5H18.5M6.88 8.56A1.68 1.68 0 0 0 8.56 6.88C8.56 5.95 7.81 5.19 6.88 5.19A1.69 1.69 0 0 0 5.19 6.88C5.19 7.81 5.95 8.56 6.88 8.56M8.27 18.5V10.13H5.5V18.5H8.27Z"
+                        />
+                      </svg>
+                    </a>
+                  }
+                </div> -->
+              </div>
+
+              <!-- Member Info -->
+              <div class="p-6 pb-4">
+                <h3
+                  class="text-lg font-extrabold text-[#172F61] group-hover:text-[#315FEA] transition-colors"
+                >
+                  {{ member.name }}
+                </h3>
+                <p class="text-xs font-bold uppercase tracking-wide text-[#315FEA] mt-0.5">
+                  {{ member.role }}
+                </p>
+                <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+                  {{ member.bio }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Card Footer Social Links -->
+            <div
+              class="px-6 pb-6 pt-3 border-t border-slate-200/70 flex items-center justify-between gap-4"
+            >
+              @if (member.linkedinUrl) {
+                <a
+                  [href]="member.linkedinUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 text-xs font-bold text-[#0A66C2] hover:text-[#172F61] transition-colors"
+                >
+                  <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path
+                      d="M19 3A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3H19M18.5 18.5V13.2A3.26 3.26 0 0 0 15.24 9.94C14.39 9.94 13.4 10.46 12.92 11.24V10.13H10.13V18.5H12.92V13.57C12.92 12.8 13.54 12.17 14.31 12.17A1.4 1.4 0 0 1 15.71 13.57V18.5H18.5M6.88 8.56A1.68 1.68 0 0 0 8.56 6.88C8.56 5.95 7.81 5.19 6.88 5.19A1.69 1.69 0 0 0 5.19 6.88C5.19 7.81 5.95 8.56 6.88 8.56M8.27 18.5V10.13H5.5V18.5H8.27Z"
+                    />
+                  </svg>
+                  <span>LinkedIn</span>
+                </a>
+              }
+
+              @if (member.githubUrl) {
+                <a
+                  [href]="member.githubUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-black transition-colors"
+                >
+                  <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path
+                      d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                    />
+                  </svg>
+                  <span>GitHub</span>
+                </a>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- STUDENT FEEDBACK & SUCCESS STORIES (Live Database Synced)  -->
+  <!-- ========================================================= -->
+  <section class="py-20 bg-[#F4F7FE]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <span
+          class="inline-block text-xs font-bold uppercase tracking-wider text-[#315FEA] bg-[#315FEA]/10 px-3 py-1 rounded-full mb-2"
+          >Verified Student Community</span
+        >
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-[#172F61]">
+          Trusted by Toppers Across India
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500 mt-2">
+          Real feedback from aspirants preparing with ExamSphere AI adaptive test engines and
+          syllabus explorers.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        @for (fb of feedbacks; track fb.name) {
+          <div
+            class="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+          >
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-1 text-amber-400 text-sm">
+                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                </div>
+                <span
+                  class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200"
+                >
+                  ✓ Verified Review
+                </span>
+              </div>
+              <p class="text-slate-600 italic text-sm leading-relaxed">"{{ fb.quote }}"</p>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-slate-100 flex items-center gap-4">
+              <div
+                class="w-12 h-12 rounded-full bg-gradient-to-br from-[#315FEA] to-[#172F61] text-white font-bold flex items-center justify-center shrink-0 shadow-sm"
+              >
+                {{ fb.avatar }}
+              </div>
+              <div>
+                <h4 class="font-bold text-[#172F61] text-sm">{{ fb.name }}</h4>
+                <p class="text-xs font-semibold text-[#315FEA]">{{ fb.exam }} • {{ fb.rank }}</p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="mt-12 text-center">
+        <a
+          routerLink="/about"
+          fragment="feedback"
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-slate-200 text-[#315FEA] hover:bg-blue-50 font-bold text-xs shadow-xs hover:shadow transition"
+        >
+          <span>💬 Read More Reviews & Share Your Feedback on About Page</span>
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>

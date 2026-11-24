@@ -1,0 +1,1186 @@
+<div class="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-blue-600 selection:text-white">
+
+  <!-- ======================================================== -->
+  <!-- 1. EXAM SELECTION MODE ("All exam names display at first") -->
+  <!-- ======================================================== -->
+  @if (currentMode === 'EXAM_SELECT') {
+    <!-- Hero Banner -->
+    <section class="bg-gradient-to-b from-[#172F61] via-[#0F1E42] to-slate-900 text-white py-14 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden">
+      <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]"></div>
+      <div class="max-w-4xl mx-auto space-y-3 relative z-10">
+        <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-400/30">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          National Examination Testing Portal
+        </span>
+        <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight">
+          Select Your Target Examination
+        </h1>
+        <p class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto">
+          Choose an exam to access official exam pattern simulations or generate personalized custom practice tests with instant evaluation.
+        </p>
+      </div>
+    </section>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 space-y-4">
+      <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200 p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <!-- Search Input -->
+        <div class="relative flex-1 min-w-[260px]">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            🔍
+          </span>
+          <input
+            type="text"
+            [(ngModel)]="examSearchTerm"
+            placeholder="Search exam name (e.g. JEE Main, NEET, GATE, UPSC, CAT, SSC, CLAT, NDA)..."
+            class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white bg-slate-50 transition"
+          />
+          @if (examSearchTerm) {
+            <button
+              type="button"
+              (click)="examSearchTerm = ''"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 text-xs font-bold"
+            >
+              ✕
+            </button>
+          }
+        </div>
+
+        <div class="text-xs text-slate-500 font-medium shrink-0 flex items-center gap-2">
+          <span>Available Exams:</span>
+          <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-extrabold border border-blue-200">
+            {{ filteredExams.length }} Examinations
+          </span>
+        </div>
+      </div>
+
+      <!-- Stream Category Filter Tabs -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        @for (cat of streamCategories; track cat.id) {
+          <button
+            type="button"
+            (click)="selectStreamCategory(cat.id)"
+            [class]="
+              selectedStreamFilter === cat.id
+                ? 'px-4 py-2 rounded-xl text-xs font-extrabold bg-[#172F61] text-white shadow-md shadow-blue-950/20 whitespace-nowrap transition flex items-center gap-1.5'
+                : 'px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/90 whitespace-nowrap transition flex items-center gap-1.5'
+            "
+          >
+            <span>{{ cat.icon }}</span>
+            <span>{{ cat.label }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Exam Cards Grid -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      @if (isLoadingExams) {
+        <div class="text-center py-20 text-slate-500 text-sm">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent mb-3"></div>
+          <p>Loading verified examination catalogs...</p>
+        </div>
+      } @else if (filteredExams.length === 0) {
+        <div class="bg-white rounded-3xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 font-bold text-2xl flex items-center justify-center mx-auto">
+            🔍
+          </div>
+          <h3 class="text-lg font-bold text-[#172F61]">No Examination Found</h3>
+          <p class="text-xs text-slate-600">
+            No examinations match "<strong class="text-slate-800">{{ examSearchTerm }}</strong>". Try searching for JEE, NEET, UPSC, or GATE.
+          </p>
+          <button
+            type="button"
+            (click)="examSearchTerm = ''; selectedStreamFilter = 'All'"
+            class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition"
+          >
+            Reset Filters
+          </button>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (exam of filteredExams; track exam._id) {
+            <div
+              (click)="selectExam(exam)"
+              class="group bg-white rounded-2xl border border-slate-200/90 hover:border-blue-500 hover:shadow-xl transition-all duration-200 p-6 flex flex-col justify-between cursor-pointer"
+            >
+              <div>
+                <!-- Category & Conducting Body -->
+                <div class="flex items-center justify-between gap-2 mb-3">
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                    {{ exam.category }}
+                  </span>
+                  <span class="text-[11px] font-medium text-slate-500 truncate max-w-[160px]" [title]="exam.conductingBody">
+                    {{ exam.conductingBody }}
+                  </span>
+                </div>
+
+                <!-- Exam Title -->
+                <h3 class="text-lg font-extrabold text-[#172F61] group-hover:text-blue-600 transition leading-snug">
+                  {{ exam.name }}
+                </h3>
+
+                <!-- Pattern Blueprint Summary Pill -->
+                <p class="text-xs text-slate-600 mt-2 line-clamp-2">
+                  {{ exam.blueprint.blueprintSummary }}
+                </p>
+
+                <!-- Blueprint Specs Ribbon -->
+                <div class="mt-4 grid grid-cols-3 gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100 text-center text-xs">
+                  <div>
+                    <div class="font-bold text-slate-800">{{ exam.blueprint.officialDurationMinutes }}m</div>
+                    <div class="text-[10px] text-slate-500">Duration</div>
+                  </div>
+                  <div>
+                    <div class="font-bold text-slate-800">{{ exam.blueprint.totalMarks }}</div>
+                    <div class="text-[10px] text-slate-500">Total Marks</div>
+                  </div>
+                  <div>
+                    <div class="font-bold text-slate-800">{{ exam.blueprint.totalQuestions }}</div>
+                    <div class="text-[10px] text-slate-500">Questions</div>
+                  </div>
+                </div>
+
+                <!-- Subjects list snippet -->
+                <div class="mt-3 text-[11px] text-slate-500">
+                  <span class="font-semibold text-slate-700">Subjects:</span>
+                  <span class="ml-1 text-slate-600 truncate inline-block max-w-[240px] align-bottom">
+                    {{ exam.subjects.slice(0, 3).join(', ') }}{{ exam.subjects.length > 3 ? '...' : '' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Card Action Footer -->
+              <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+                  <span>✓</span>
+                  <span>2 Test Modes Ready</span>
+                </div>
+                <button
+                  type="button"
+                  class="px-4 py-2 rounded-xl bg-[#172F61] group-hover:bg-blue-600 text-white font-bold text-xs shadow-md shadow-blue-950/10 transition flex items-center gap-1"
+                >
+                  <span>Select Exam</span>
+                  <span>→</span>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </main>
+  }
+
+  <!-- ======================================================== -->
+  <!-- 2. SELECTED EXAM TESTING HUB (2 Main Options)            -->
+  <!-- ======================================================== -->
+  @if (currentMode === 'EXAM_HUB' && selectedExam) {
+    <!-- Exam Header & Breadcrumb -->
+    <section class="bg-gradient-to-b from-[#172F61] via-[#0F1E42] to-slate-900 text-white py-8 px-4 sm:px-6 lg:px-8 border-b border-blue-950">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <button
+            type="button"
+            (click)="switchExam()"
+            class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-300 hover:text-white transition mb-2"
+          >
+            <span>←</span>
+            <span>Switch / Choose Another Examination</span>
+          </button>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30">
+              {{ selectedExam.category }}
+            </span>
+            <span class="text-xs text-slate-400">Conducting Body: {{ selectedExam.conductingBody }}</span>
+          </div>
+          <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight mt-1">
+            {{ selectedExam.name }}
+          </h1>
+          <p class="text-slate-300 text-xs sm:text-sm mt-1 max-w-3xl">
+            {{ selectedExam.blueprint.blueprintSummary }} • {{ selectedExam.blueprint.negativeMarkingFormula }}
+          </p>
+        </div>
+
+        <div class="shrink-0 flex items-center gap-3">
+          <button
+            type="button"
+            (click)="switchExam()"
+            class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold border border-white/20 transition"
+          >
+            Change Exam
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 MAIN OPTIONS TABS -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 relative z-20">
+      <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200 p-2 flex flex-col sm:flex-row gap-2">
+        <!-- Option 1 Tab: Official Exam Types -->
+        <button
+          type="button"
+          (click)="setHubTab('OFFICIAL_PATTERN')"
+          [class]="
+            activeHubTab === 'OFFICIAL_PATTERN'
+              ? 'flex-1 p-4 rounded-xl bg-blue-50 border-2 border-blue-600 text-left transition'
+              : 'flex-1 p-4 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-left transition'
+          "
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">🏛️</span>
+              <div>
+                <div class="text-xs font-extrabold uppercase tracking-wider" [class]="activeHubTab === 'OFFICIAL_PATTERN' ? 'text-blue-700' : 'text-slate-500'">
+                  Option 1: Official Pattern
+                </div>
+                <div class="text-sm sm:text-base font-bold text-slate-900">
+                  Real Exam Types Simulation
+                </div>
+              </div>
+            </div>
+            @if (activeHubTab === 'OFFICIAL_PATTERN') {
+              <span class="w-3 h-3 rounded-full bg-blue-600"></span>
+            }
+          </div>
+          <p class="text-xs text-slate-500 mt-2">
+            The exam actually that type happens: full official time limit, official sections, exact marks, and negative marking.
+          </p>
+        </button>
+
+        <!-- Option 2 Tab: Customize Test -->
+        <button
+          type="button"
+          (click)="setHubTab('CUSTOMIZE_TEST')"
+          [class]="
+            activeHubTab === 'CUSTOMIZE_TEST'
+              ? 'flex-1 p-4 rounded-xl bg-blue-50 border-2 border-blue-600 text-left transition'
+              : 'flex-1 p-4 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-left transition'
+          "
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">🛠️</span>
+              <div>
+                <div class="text-xs font-extrabold uppercase tracking-wider" [class]="activeHubTab === 'CUSTOMIZE_TEST' ? 'text-blue-700' : 'text-slate-500'">
+                  Option 2: Custom Generator
+                </div>
+                <div class="text-sm sm:text-base font-bold text-slate-900">
+                  Customize Your Test
+                </div>
+              </div>
+            </div>
+            @if (activeHubTab === 'CUSTOMIZE_TEST') {
+              <span class="w-3 h-3 rounded-full bg-blue-600"></span>
+            }
+          </div>
+          <p class="text-xs text-slate-500 mt-2">
+            Build your own test: select specific subjects, chapters, questions count, difficulty, and practice time.
+          </p>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN OPTIONS CONTENT -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+      <!-- ======================================================== -->
+      <!-- OPTION 1 CONTENT: REAL EXAM TYPES / OFFICIAL PATTERN      -->
+      <!-- ======================================================== -->
+      @if (activeHubTab === 'OFFICIAL_PATTERN') {
+        <!-- Official Blueprint Summary Card -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Official Specification</span>
+              <h2 class="text-xl font-extrabold text-[#172F61]">Real Exam Day Blueprint & Marking Scheme</h2>
+            </div>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 font-bold border border-blue-200">
+                ⏱️ {{ selectedExam.blueprint.officialDurationMinutes }} Minutes Total
+              </span>
+              <span class="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
+                🎯 {{ selectedExam.blueprint.totalMarks }} Max Marks
+              </span>
+              <span class="px-3 py-1.5 rounded-xl bg-rose-50 text-rose-700 font-bold border border-rose-200">
+                ⚠️ {{ selectedExam.blueprint.negativeMarkingFormula }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Sectional Breakdown -->
+          <div class="mt-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Official Sections & Questions Distribution:</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              @for (sec of selectedExam.blueprint.sections; track sec.name) {
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <div class="text-xs font-extrabold text-slate-800">{{ sec.name }}</div>
+                  <div class="mt-1 flex items-center justify-between text-[11px] text-slate-500">
+                    <span>{{ sec.questionCount }} Questions</span>
+                    <span class="font-bold text-slate-700">{{ sec.marks }} Marks</span>
+                  </div>
+                  @if (sec.durationMinutes) {
+                    <div class="mt-1 text-[10px] text-blue-600 font-semibold">
+                      🔒 {{ sec.durationMinutes }}m Sectional Timer
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Official Rules & Instructions -->
+          <div class="mt-6 pt-5 border-t border-slate-100">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Official Examination Guidelines:</h3>
+            <ul class="space-y-1.5 text-xs text-slate-600 list-disc list-inside">
+              @for (rule of selectedExam.blueprint.officialRules; track rule) {
+                <li>{{ rule }}</li>
+              }
+            </ul>
+          </div>
+        </div>
+
+        <!-- Available Full-Length Official Mock Papers -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-extrabold text-[#172F61]">
+              Available Official Pattern Mock Papers ({{ officialMockTests.length }})
+            </h3>
+            <span class="text-xs text-slate-500">Modeled strictly after official question blueprints</span>
+          </div>
+
+          @if (isLoadingTests) {
+            <div class="text-center py-12 text-slate-500 text-sm">
+              <div class="inline-block animate-spin rounded-full h-7 w-7 border-4 border-blue-600 border-t-transparent mb-2"></div>
+              <p>Loading official test papers...</p>
+            </div>
+          } @else if (officialMockTests.length === 0) {
+            <div class="bg-white rounded-2xl border border-slate-200 p-8 text-center text-sm text-slate-600">
+              No official pattern papers currently indexed for this exam. You can use the <strong>Customize Test</strong> option to practice immediately!
+            </div>
+          } @else {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              @for (test of officialMockTests; track test._id) {
+                <div class="bg-white rounded-2xl border border-slate-200/90 hover:border-blue-400 hover:shadow-lg transition p-6 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                      <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                        Official Simulation
+                      </span>
+                      <span
+                        [class]="
+                          test.difficulty === 'Hard'
+                            ? 'px-2 py-0.5 rounded text-[11px] font-bold bg-rose-50 text-rose-700'
+                            : test.difficulty === 'Medium'
+                              ? 'px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-700'
+                              : 'px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700'
+                        "
+                      >
+                        {{ test.difficulty }}
+                      </span>
+                    </div>
+
+                    <h4 class="text-base font-bold text-[#172F61] line-clamp-2">{{ test.title }}</h4>
+                    <p class="text-xs text-slate-500 mt-1 line-clamp-1">Subject: <span class="font-semibold text-slate-700">{{ test.subject }}</span></p>
+
+                    <!-- Stats Badges -->
+                    <div class="mt-4 grid grid-cols-3 gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100 text-center text-xs">
+                      <div>
+                        <div class="font-bold text-slate-800">{{ test.questions.length }}</div>
+                        <div class="text-[10px] text-slate-500">Questions</div>
+                      </div>
+                      <div>
+                        <div class="font-bold text-slate-800">{{ test.durationMinutes }}m</div>
+                        <div class="text-[10px] text-slate-500">Duration</div>
+                      </div>
+                      <div>
+                        <div class="font-bold text-slate-800">{{ test.totalMarks }}</div>
+                        <div class="text-[10px] text-slate-500">Marks</div>
+                      </div>
+                    </div>
+
+                    <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500">
+                      <span>Negative Marking:</span>
+                      <span class="font-bold text-rose-600">-{{ (test.negativeMarkingRate * 100) | number:'1.0-0' }}% per wrong</span>
+                    </div>
+                  </div>
+
+                  <div class="mt-6 pt-4 border-t border-slate-100">
+                    <button
+                      type="button"
+                      (click)="startTest(test)"
+                      class="w-full py-2.5 rounded-xl bg-[#172F61] hover:bg-blue-600 text-white font-bold text-xs shadow-md shadow-blue-950/10 transition flex items-center justify-center gap-1.5"
+                    >
+                      <span>Launch Real Pattern Simulation</span>
+                      <span>→</span>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- ======================================================== -->
+      <!-- OPTION 2 CONTENT: CUSTOMIZE TEST GENERATOR                -->
+      <!-- ======================================================== -->
+      @if (activeHubTab === 'CUSTOMIZE_TEST') {
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-8">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Personalized Assessment</span>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-[#172F61]">
+              Customize Your Practice Test for {{ selectedExam.name }}
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+              Assemble a tailored test focusing on specific subjects, topics, question limits, and time durations.
+            </p>
+          </div>
+
+          <!-- 1. Subject Selection -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-700">
+                1. Select Subject(s) to Test:
+              </label>
+              <div class="space-x-2 text-xs">
+                <button
+                  type="button"
+                  (click)="selectAllSubjects(true)"
+                  class="font-bold text-blue-600 hover:underline"
+                >
+                  Select All
+                </button>
+                <span class="text-slate-300">|</span>
+                <button
+                  type="button"
+                  (click)="selectAllSubjects(false)"
+                  class="font-bold text-slate-500 hover:underline"
+                >
+                  Clear All
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+              @for (sub of selectedExam.subjects; track sub) {
+                <label
+                  (click)="toggleSubject(sub)"
+                  [class]="
+                    customSubjects[sub]
+                      ? 'p-3 rounded-xl border-2 border-blue-600 bg-blue-50/70 text-blue-900 font-bold text-xs flex items-center justify-between cursor-pointer transition'
+                      : 'p-3 rounded-xl border border-slate-200 hover:border-slate-300 bg-white text-slate-700 font-medium text-xs flex items-center justify-between cursor-pointer transition'
+                  "
+                >
+                  <span>{{ sub }}</span>
+                  <input
+                    type="checkbox"
+                    [checked]="customSubjects[sub]"
+                    class="rounded text-blue-600 focus:ring-blue-500 h-4 w-4"
+                  />
+                </label>
+              }
+            </div>
+          </div>
+
+          <!-- 2. Specific Topic / Chapter (Optional) -->
+          <div class="space-y-2">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-700">
+              2. Focus Topic / Chapter (Optional):
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="customTopic"
+              placeholder="e.g. Thermodynamics, Algorithms, Kinematics, Indian Polity, Organic Chemistry..."
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-slate-50 focus:bg-white transition"
+            />
+          </div>
+
+          <!-- 3. Difficulty Level -->
+          <div class="space-y-2">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-700">
+              3. Difficulty Level:
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <button
+                type="button"
+                (click)="setCustomDifficulty('Easy')"
+                [class]="
+                  customDifficulty === 'Easy'
+                    ? 'py-2.5 px-3 rounded-xl bg-[#172F61] text-white font-bold text-xs shadow-md transition'
+                    : 'py-2.5 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition'
+                "
+              >
+                Easy
+              </button>
+              <button
+                type="button"
+                (click)="setCustomDifficulty('Medium')"
+                [class]="
+                  customDifficulty === 'Medium'
+                    ? 'py-2.5 px-3 rounded-xl bg-[#172F61] text-white font-bold text-xs shadow-md transition'
+                    : 'py-2.5 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition'
+                "
+              >
+                Medium
+              </button>
+              <button
+                type="button"
+                (click)="setCustomDifficulty('Hard')"
+                [class]="
+                  customDifficulty === 'Hard'
+                    ? 'py-2.5 px-3 rounded-xl bg-[#172F61] text-white font-bold text-xs shadow-md transition'
+                    : 'py-2.5 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition'
+                "
+              >
+                Hard
+              </button>
+              <button
+                type="button"
+                (click)="setCustomDifficulty('Mixed')"
+                [class]="
+                  customDifficulty === 'Mixed'
+                    ? 'py-2.5 px-3 rounded-xl bg-[#172F61] text-white font-bold text-xs shadow-md transition'
+                    : 'py-2.5 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition'
+                "
+              >
+                Mixed / Adaptive
+              </button>
+            </div>
+          </div>
+
+          <!-- 4. Number of Questions & Duration Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Question Count -->
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-700">
+                4. Number of Questions:
+              </label>
+              <div class="grid grid-cols-4 gap-2">
+                @for (cnt of [5, 10, 20, 30]; track cnt) {
+                  <button
+                    type="button"
+                    (click)="customQuestionCount = cnt; customDurationMinutes = cnt * 2"
+                    [class]="
+                      customQuestionCount === cnt
+                        ? 'py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-md transition'
+                        : 'py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition'
+                    "
+                  >
+                    {{ cnt }} Qs
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Time Duration -->
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-700">
+                5. Time Duration (Minutes):
+              </label>
+              <div class="grid grid-cols-4 gap-2">
+                @for (mins of [15, 30, 45, 60]; track mins) {
+                  <button
+                    type="button"
+                    (click)="customDurationMinutes = mins"
+                    [class]="
+                      customDurationMinutes === mins
+                        ? 'py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-md transition'
+                        : 'py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition'
+                    "
+                  >
+                    {{ mins }} Mins
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Negative Marking Scheme -->
+          <div class="space-y-2">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-700">
+              6. Negative Marking Setting:
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label
+                (click)="customNegativeMarking = true"
+                [class]="
+                  customNegativeMarking
+                    ? 'p-3 rounded-xl border-2 border-blue-600 bg-blue-50/60 flex items-center gap-3 cursor-pointer'
+                    : 'p-3 rounded-xl border border-slate-200 hover:bg-slate-50 flex items-center gap-3 cursor-pointer'
+                "
+              >
+                <input type="radio" [checked]="customNegativeMarking" class="text-blue-600 focus:ring-blue-500" />
+                <div>
+                  <div class="text-xs font-bold text-slate-900">Official Exam Penalty Enabled</div>
+                  <div class="text-[11px] text-slate-500">Apply exam's real negative marking penalty</div>
+                </div>
+              </label>
+
+              <label
+                (click)="customNegativeMarking = false"
+                [class]="
+                  !customNegativeMarking
+                    ? 'p-3 rounded-xl border-2 border-blue-600 bg-blue-50/60 flex items-center gap-3 cursor-pointer'
+                    : 'p-3 rounded-xl border border-slate-200 hover:bg-slate-50 flex items-center gap-3 cursor-pointer'
+                "
+              >
+                <input type="radio" [checked]="!customNegativeMarking" class="text-blue-600 focus:ring-blue-500" />
+                <div>
+                  <div class="text-xs font-bold text-slate-900">Practice Mode (No Negative Marks)</div>
+                  <div class="text-[11px] text-slate-500">Zero penalty for wrong answers, ideal for learning</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Config Summary Box & Launch Button -->
+          <div class="pt-6 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="text-xs text-slate-600">
+              Configured: <strong class="text-slate-800">{{ getSelectedSubjectsList().length }} Subjects</strong> •
+              <strong class="text-slate-800">{{ customQuestionCount }} Questions</strong> •
+              <strong class="text-slate-800">{{ customDurationMinutes }} Mins</strong> •
+              <span class="text-blue-600 font-semibold">{{ customDifficulty }} Difficulty</span>
+            </div>
+
+            <button
+              type="button"
+              (click)="launchCustomTest()"
+              [disabled]="isGeneratingCustom"
+              class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-sm shadow-lg shadow-blue-900/20 transition flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              @if (isGeneratingCustom) {
+                <div class="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                <span>Creating Custom Test...</span>
+              } @else {
+                <span>🚀</span>
+                <span>Launch Customized Mock Test</span>
+              }
+            </button>
+          </div>
+        </div>
+      }
+    </main>
+  }
+
+  <!-- ======================================================== -->
+  <!-- 3. ACTIVE TEST TAKING MODE (CBT ENGINE)                  -->
+  <!-- ======================================================== -->
+  @if (currentMode === 'ACTIVE_TEST' && activeTest) {
+    <!-- Sticky Exam Header Bar -->
+    <header class="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm px-4 sm:px-6 py-3 flex items-center justify-between">
+      <div>
+        <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600">{{ activeTest.examName }}</span>
+        <h2 class="text-sm sm:text-base font-bold text-[#172F61] truncate max-w-md">{{ activeTest.title }}</h2>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <!-- Countdown Timer -->
+        <div
+          [class]="
+            timeRemainingSeconds < 300
+              ? 'px-4 py-2 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-2 animate-pulse'
+              : 'px-4 py-2 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-2'
+          "
+        >
+          <span class="text-xs font-bold">⏱ Time Left:</span>
+          <span class="font-mono text-base font-extrabold">{{ formatTime(timeRemainingSeconds) }}</span>
+        </div>
+
+        <button
+          type="button"
+          (click)="openSubmitConfirmation()"
+          class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition"
+        >
+          Submit Test
+        </button>
+      </div>
+    </header>
+
+    <!-- Section Navigation Toolbar (Subject Tabs) -->
+    @if (testSections.length > 1) {
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div class="bg-white rounded-2xl border border-slate-200 p-2 flex items-center gap-2 overflow-x-auto shadow-sm">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400 px-2 shrink-0">Sections:</span>
+          <button
+            type="button"
+            (click)="setSectionFilter('All')"
+            [class]="
+              activeSectionFilter === 'All'
+                ? 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-[#172F61] text-white shadow-sm transition shrink-0'
+                : 'px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition shrink-0'
+            "
+          >
+            All Questions ({{ activeTest.questions.length }})
+          </button>
+          @for (sec of testSections; track sec.name) {
+            <button
+              type="button"
+              (click)="setSectionFilter(sec.name)"
+              [class]="
+                activeSectionFilter === sec.name
+                  ? 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-blue-600 text-white shadow-sm transition shrink-0 flex items-center gap-1.5'
+                  : 'px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition shrink-0 flex items-center gap-1.5'
+              "
+            >
+              <span>{{ sec.name }}</span>
+              <span class="px-1.5 py-0.2 rounded text-[10px] font-bold" [class]="activeSectionFilter === sec.name ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'">
+                {{ sec.count }}
+              </span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Question Viewing Area (8 Cols) -->
+      <div class="lg:col-span-8 space-y-6">
+        @if (currentQuestion) {
+          <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+            <!-- Question Metadata Bar -->
+            <div class="flex items-center justify-between gap-2 pb-4 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-extrabold">
+                  Question {{ currentQuestionIndex + 1 }} of {{ activeTest.questions.length }}
+                </span>
+                <span class="text-xs font-semibold text-slate-500">
+                  {{ currentQuestion.subject }}
+                </span>
+              </div>
+              <div class="flex items-center gap-2 text-xs">
+                <span class="text-emerald-700 font-bold">+{{ currentQuestion.marks || 4 }}</span>
+                <span class="text-slate-300">/</span>
+                <span class="text-rose-600 font-bold">-{{ ((activeTest.negativeMarkingRate || 0.25) * (currentQuestion.marks || 4)) | number:'1.1-2' }}</span>
+              </div>
+            </div>
+
+            <!-- Question Statement -->
+            <div class="text-sm sm:text-base font-medium text-slate-900 leading-relaxed">
+              {{ currentQuestion.questionText }}
+            </div>
+
+            <!-- Options Radio List -->
+            <div class="space-y-3 pt-2">
+              @for (opt of currentQuestion.options; track $index) {
+                <label
+                  (click)="selectOption($index)"
+                  [class]="
+                    userAnswers[currentQuestionIndex] === $index
+                      ? 'p-4 rounded-xl border-2 border-blue-600 bg-blue-50/70 text-blue-950 font-bold text-xs sm:text-sm flex items-start gap-3 cursor-pointer transition shadow-sm'
+                      : 'p-4 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-medium text-xs sm:text-sm flex items-start gap-3 cursor-pointer transition'
+                  "
+                >
+                  <span
+                    [class]="
+                      userAnswers[currentQuestionIndex] === $index
+                        ? 'w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5'
+                        : 'w-6 h-6 rounded-full border border-slate-300 text-slate-500 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5'
+                    "
+                  >
+                    {{ ['A', 'B', 'C', 'D'][$index] || $index + 1 }}
+                  </span>
+                  <span class="leading-relaxed">{{ opt }}</span>
+                </label>
+              }
+            </div>
+
+            <!-- Question Action Controls -->
+            <div class="pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  (click)="toggleMarkForReview()"
+                  [class]="
+                    markedForReview.has(currentQuestionIndex)
+                      ? 'px-4 py-2 rounded-xl bg-purple-100 text-purple-700 font-bold text-xs border border-purple-300 transition'
+                      : 'px-4 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-purple-50 hover:text-purple-700 font-semibold text-xs transition'
+                  "
+                >
+                  {{ markedForReview.has(currentQuestionIndex) ? '★ Marked for Review' : 'Mark for Review' }}
+                </button>
+                @if (userAnswers[currentQuestionIndex] !== undefined) {
+                  <button
+                    type="button"
+                    (click)="clearOption()"
+                    class="px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 font-semibold text-xs transition"
+                  >
+                    Clear Response
+                  </button>
+                }
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  (click)="prevQuestion()"
+                  [disabled]="currentQuestionIndex === 0"
+                  class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 disabled:opacity-40 transition"
+                >
+                  ← Previous
+                </button>
+                <button
+                  type="button"
+                  (click)="nextQuestion()"
+                  [disabled]="currentQuestionIndex === activeTest.questions.length - 1"
+                  class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition disabled:opacity-40"
+                >
+                  Save & Next →
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Question Palette & Summary Sidebar (4 Cols) -->
+      <aside class="lg:col-span-4 space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Question Palette Status</h3>
+
+          <!-- Status Legend -->
+          <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-600">
+            <div class="flex items-center gap-2">
+              <span class="w-4 h-4 rounded bg-emerald-600"></span>
+              <span>Answered ({{ answeredCount }})</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-4 h-4 rounded bg-rose-100 border border-rose-300"></span>
+              <span>Unanswered ({{ unansweredCount }})</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-4 h-4 rounded bg-purple-100 border border-purple-400"></span>
+              <span>Review ({{ markedCount }})</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-4 h-4 rounded bg-slate-100 border border-slate-200"></span>
+              <span>Not Visited</span>
+            </div>
+          </div>
+
+          <!-- Question Number Tiles Grid -->
+          <div class="pt-3 border-t border-slate-100">
+            <div class="flex items-center justify-between text-[11px] text-slate-500 mb-2 font-semibold">
+              <span>Section: {{ activeSectionFilter === 'All' ? 'All Sections' : activeSectionFilter }}</span>
+              <span>{{ displayedPaletteIndices.length }} Qs</span>
+            </div>
+            <div class="grid grid-cols-5 sm:grid-cols-6 gap-2 max-h-72 overflow-y-auto pr-1">
+              @for (idx of displayedPaletteIndices; track idx) {
+                <button
+                  type="button"
+                  (click)="goToQuestion(idx)"
+                  [class]="getQuestionPaletteClass(idx)"
+                >
+                  {{ idx + 1 }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Submit Button in Palette -->
+          <div class="pt-4 border-t border-slate-100">
+            <button
+              type="button"
+              (click)="openSubmitConfirmation()"
+              class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md transition"
+            >
+              Submit Test & View Score
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  }
+
+  <!-- Submit Confirmation Modal -->
+  @if (isSubmitModalOpen) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+      <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+        <h3 class="text-lg font-extrabold text-[#172F61]">Submit Examination?</h3>
+        <p class="text-xs text-slate-600">
+          You have answered <strong>{{ answeredCount }}</strong> of <strong>{{ activeTest?.questions?.length }}</strong> questions.
+          Are you sure you want to finalize your submission?
+        </p>
+
+        <div class="grid grid-cols-3 gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100 text-center text-xs">
+          <div>
+            <div class="font-bold text-emerald-600">{{ answeredCount }}</div>
+            <div class="text-[10px] text-slate-500">Answered</div>
+          </div>
+          <div>
+            <div class="font-bold text-purple-600">{{ markedCount }}</div>
+            <div class="text-[10px] text-slate-500">For Review</div>
+          </div>
+          <div>
+            <div class="font-bold text-rose-600">{{ unansweredCount }}</div>
+            <div class="text-[10px] text-slate-500">Unanswered</div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button
+            type="button"
+            (click)="closeSubmitConfirmation()"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition"
+          >
+            Resume Test
+          </button>
+          <button
+            type="button"
+            (click)="confirmSubmit()"
+            class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition"
+          >
+            Yes, Submit Now
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ======================================================== -->
+  <!-- 4. RESULT & SCORECARD MODE                               -->
+  <!-- ======================================================== -->
+  @if (currentMode === 'RESULT' && testResult) {
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <!-- Scorecard Banner -->
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-lg shadow-slate-200/50">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-slate-100">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-blue-600">{{ testResult.examName }}</span>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#172F61] mt-1">{{ testResult.testTitle }}</h1>
+            <p class="text-xs text-slate-500 mt-1">
+              Assessment completed in {{ formatTime(testResult.timeSpentSeconds) }}
+            </p>
+          </div>
+
+          <!-- Total Score Pill -->
+          <div class="flex items-center gap-4">
+            <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center min-w-[140px] shadow-lg shadow-blue-600/20">
+              <div class="text-2xl sm:text-3xl font-extrabold">{{ testResult.score }}</div>
+              <div class="text-[11px] text-blue-100 uppercase tracking-wider font-semibold">
+                out of {{ testResult.maxScore }} Marks
+              </div>
+            </div>
+            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-center min-w-[120px]">
+              <div class="text-2xl sm:text-3xl font-extrabold">{{ testResult.accuracyPercentage }}%</div>
+              <div class="text-[11px] text-emerald-700 uppercase tracking-wider font-semibold">
+                Accuracy
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metric Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 text-center">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+            <div class="text-xl font-extrabold text-slate-800">{{ testResult.totalQuestions }}</div>
+            <div class="text-xs text-slate-500 mt-0.5">Total Questions</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+            <div class="text-xl font-extrabold text-blue-600">{{ testResult.attemptedCount }}</div>
+            <div class="text-xs text-slate-500 mt-0.5">Attempted</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+            <div class="text-xl font-extrabold text-emerald-600">{{ testResult.correctCount }}</div>
+            <div class="text-xs text-slate-500 mt-0.5">Correct Answers</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+            <div class="text-xl font-extrabold text-rose-600">{{ testResult.wrongCount }}</div>
+            <div class="text-xs text-slate-500 mt-0.5">Incorrect Answers</div>
+          </div>
+        </div>
+
+        <!-- Section-wise Performance Breakdown -->
+        @if (sectionPerformance.length > 0) {
+          <div class="mt-8 pt-6 border-t border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#172F61]">
+                Subject / Section Performance Breakdown
+              </h3>
+              <span class="text-xs text-slate-500">Real exam accuracy analysis</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              @for (sec of sectionPerformance; track sec.subject) {
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-slate-900 truncate max-w-[160px]">{{ sec.subject }}</span>
+                    <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                      {{ sec.score >= 0 ? '+' : '' }}{{ sec.score }} Marks
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-between text-xs text-slate-600">
+                    <span>Attempted: <strong>{{ sec.attempted }}</strong> / {{ sec.total }}</span>
+                    <span>Accuracy: <strong class="text-emerald-700">{{ sec.accuracy }}%</strong></span>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-[11px] text-slate-500">
+                    <span class="text-emerald-600 font-bold">✓ {{ sec.correct }} Correct</span>
+                    <span>•</span>
+                    <span class="text-rose-600 font-bold">✕ {{ sec.wrong }} Wrong</span>
+                  </div>
+                  <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                    <div
+                      class="bg-emerald-500 h-full rounded-full transition-all duration-500"
+                      [style.width.%]="sec.accuracy"
+                    ></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Action Navigation Buttons -->
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="retakeCurrentTest()"
+            class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5"
+          >
+            <span>🔄</span>
+            <span>Retake This Test</span>
+          </button>
+          <button
+            type="button"
+            (click)="backToExamHub()"
+            class="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs transition"
+          >
+            Back to {{ selectedExam?.name || 'Exam' }} Hub
+          </button>
+        </div>
+
+        <button
+          type="button"
+          (click)="backToExamSelection()"
+          class="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-blue-600 hover:bg-blue-50 font-bold text-xs transition"
+        >
+          Choose Another Examination →
+        </button>
+      </div>
+
+      <!-- Detailed Question-by-Question Review -->
+      <div class="space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h2 class="text-xl font-extrabold text-[#172F61]">
+            Detailed Solution & Conceptual Explanations
+          </h2>
+
+          <!-- Review Filters -->
+          <div class="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-200">
+            <button
+              type="button"
+              (click)="setReviewFilter('All')"
+              [class]="
+                reviewFilter === 'All'
+                  ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-[#172F61] text-white transition'
+                  : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition'
+              "
+            >
+              All
+            </button>
+            <button
+              type="button"
+              (click)="setReviewFilter('Correct')"
+              [class]="
+                reviewFilter === 'Correct'
+                  ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-[#172F61] text-white transition'
+                  : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition'
+              "
+            >
+              Correct
+            </button>
+            <button
+              type="button"
+              (click)="setReviewFilter('Incorrect')"
+              [class]="
+                reviewFilter === 'Incorrect'
+                  ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-[#172F61] text-white transition'
+                  : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition'
+              "
+            >
+              Incorrect
+            </button>
+            <button
+              type="button"
+              (click)="setReviewFilter('Unattempted')"
+              [class]="
+                reviewFilter === 'Unattempted'
+                  ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-[#172F61] text-white transition'
+                  : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition'
+              "
+            >
+              Unattempted
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          @for (q of filteredReviewQuestions; track q.questionIndex) {
+            <div
+              [class]="
+                !q.isAttempted
+                  ? 'bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4'
+                  : q.isCorrect
+                    ? 'bg-white rounded-2xl border-l-4 border-l-emerald-500 border border-slate-200 p-6 shadow-sm space-y-4'
+                    : 'bg-white rounded-2xl border-l-4 border-l-rose-500 border border-slate-200 p-6 shadow-sm space-y-4'
+              "
+            >
+              <!-- Question Header -->
+              <div class="flex items-center justify-between gap-2 text-xs">
+                <span class="font-extrabold text-slate-700">Question {{ q.questionIndex + 1 }}</span>
+                <span
+                  [class]="
+                    !q.isAttempted
+                      ? 'px-2.5 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600'
+                      : q.isCorrect
+                        ? 'px-2.5 py-0.5 rounded-full font-bold bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : 'px-2.5 py-0.5 rounded-full font-bold bg-rose-50 text-rose-700 border border-rose-200'
+                  "
+                >
+                  {{ !q.isAttempted ? 'Unattempted (0 Marks)' : q.isCorrect ? '✓ Correct (+4 Marks)' : '✕ Incorrect (-1 Mark)' }}
+                </span>
+              </div>
+
+              <!-- Question text -->
+              <p class="text-sm font-semibold text-slate-800 leading-relaxed">{{ q.questionText }}</p>
+
+              <!-- Options -->
+              <div class="space-y-2">
+                @for (opt of q.options; track $index) {
+                  <div
+                    [class]="
+                      $index === q.correctOptionIndex
+                        ? 'p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-950 font-bold text-xs flex items-center justify-between'
+                        : $index === q.selectedOptionIndex && !q.isCorrect
+                          ? 'p-3 rounded-xl bg-rose-50 border border-rose-300 text-rose-950 font-bold text-xs flex items-center justify-between'
+                          : 'p-3 rounded-xl bg-slate-50 border border-slate-100 text-slate-700 text-xs'
+                    "
+                  >
+                    <span>{{ ['A', 'B', 'C', 'D'][$index] || $index + 1 }}. {{ opt }}</span>
+                    @if ($index === q.correctOptionIndex) {
+                      <span class="text-emerald-700 text-xs font-extrabold">✓ Correct Answer</span>
+                    } @else if ($index === q.selectedOptionIndex) {
+                      <span class="text-rose-600 text-xs font-extrabold">✕ Your Choice</span>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- Explanation Box -->
+              <div class="p-4 rounded-xl bg-blue-50/70 border border-blue-200 text-xs text-blue-950 space-y-1">
+                <div class="font-extrabold text-blue-900 uppercase tracking-wider text-[10px]">
+                  💡 Verified Step-by-Step Explanation:
+                </div>
+                <div class="leading-relaxed">
+                  {{ q.explanation }}
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

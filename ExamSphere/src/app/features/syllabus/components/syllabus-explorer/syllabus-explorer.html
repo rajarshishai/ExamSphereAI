@@ -1,0 +1,537 @@
+<div class="min-h-screen bg-gradient-to-b from-slate-50 via-white to-blue-50/30 py-10 px-4 sm:px-6 lg:px-8 font-sans text-slate-800">
+  <div class="max-w-7xl mx-auto space-y-8">
+
+    <!-- Top Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-200">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-800 mb-3 border border-blue-200">
+          <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+          Universal Syllabus Intelligence • 120+ Verified Examinations
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-[#172F61] tracking-tight">
+          Smart Syllabus Explorer & Blueprint
+        </h1>
+        <p class="text-slate-600 mt-2 text-sm sm:text-base max-w-3xl leading-relaxed">
+          Deconstruct official examination syllabuses into organized subjects, chapters, and high-yield topics. Explore comprehensive curricula for 120+ national and international competitive examinations, and track your syllabus coverage in real time.
+        </p>
+      </div>
+
+      <!-- Quick Actions / Sync Status Badge -->
+      <div class="flex items-center gap-3 shrink-0">
+        @if (isGuest()) {
+          <a
+            routerLink="/auth"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+            </svg>
+            Sign In to Cloud Sync
+          </a>
+        } @else {
+          <div class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            Cloud Sync Active
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Universal Examination Search Bar & Filters Section -->
+    <div class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-7 shadow-sm space-y-5">
+      
+      <!-- Top Row: Global Search Bar -->
+      <div class="relative">
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+          Search Among 120+ Examinations
+        </label>
+        
+        <div class="relative flex items-center">
+          <svg class="w-5 h-5 text-blue-600 absolute left-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+
+          <input
+            type="text"
+            [ngModel]="examSearchText()"
+            (ngModelChange)="examSearchText.set($event); isSearchDropdownOpen.set(true)"
+            (focus)="isSearchDropdownOpen.set(true)"
+            placeholder="Type any exam name (e.g. UPSC CSE, NEET UG, GATE CSE, IIT JEE, CAT, SSC CGL, SBI PO, CLAT, NDA, CA Final, GRE)..."
+            class="w-full pl-12 pr-28 py-3.5 rounded-2xl border-2 border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white text-sm sm:text-base font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all shadow-xs"
+          />
+
+          <!-- Right Action: Results Count / Clear -->
+          <div class="absolute right-3 flex items-center gap-2">
+            @if (examSearchText()) {
+              <button
+                type="button"
+                (click)="examSearchText.set(''); isSearchDropdownOpen.set(false)"
+                class="px-2 py-1 text-xs font-bold text-slate-400 hover:text-slate-700 bg-slate-100 rounded-lg"
+              >
+                Clear
+              </button>
+            }
+            <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-xl border border-blue-200">
+              {{ filteredExams().length }} Found
+            </span>
+          </div>
+        </div>
+
+        <!-- Live Search Dropdown Panel -->
+        @if (isSearchDropdownOpen() && examSearchText().trim()) {
+          <div class="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl border border-slate-200 shadow-2xl z-50 max-h-80 overflow-y-auto divide-y divide-slate-100">
+            @for (item of filteredExams().slice(0, 15); track item.slug) {
+              <button
+                type="button"
+                (click)="selectExam(item.examId || item.slug || '')"
+                class="w-full text-left p-3.5 hover:bg-blue-50/80 transition flex items-center justify-between gap-3 cursor-pointer"
+              >
+                <div>
+                  <div class="text-sm font-bold text-[#172F61]">{{ item.examName }}</div>
+                  <div class="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
+                    <span class="font-medium">{{ item.conductingBody }}</span>
+                    <span>&bull;</span>
+                    <span>{{ item.subjects.length }} Subjects</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
+                  <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700">
+                    {{ item.category }}
+                  </span>
+                  <span class="text-xs text-blue-600 font-extrabold">View Syllabus →</span>
+                </div>
+              </button>
+            } @empty {
+              <div class="p-6 text-center text-sm text-slate-500">
+                No examinations match "{{ examSearchText() }}". Try searching by stream (e.g., Engineering, Medical, Banking).
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Category Filter Pills Bar -->
+      <div>
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+          Filter By Stream / Category
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (cat of categories(); track cat.name) {
+            <button
+              type="button"
+              (click)="setCategory(cat.name)"
+              [class]="
+                selectedCategory() === cat.name
+                  ? 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-[#172F61] text-white shadow-sm transition'
+                  : 'px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition'
+              "
+            >
+              {{ cat.name }} ({{ cat.count }})
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Popular Exam Quick Shortcuts -->
+      <div class="pt-2 border-t border-slate-100">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-2">Popular Exams:</span>
+        <div class="inline-flex flex-wrap gap-1.5 mt-1">
+          @for (slug of popularSlugs; track slug) {
+            <button
+              type="button"
+              (click)="selectExam(slug)"
+              [class]="
+                selectedExamId() === slug
+                  ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white'
+                  : 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:border-blue-400 hover:text-blue-600'
+              "
+            >
+              {{ slug.replace('-', ' ').toUpperCase() }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    @if (loading()) {
+      <div class="py-16 text-center space-y-3">
+        <div class="inline-block w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-sm font-semibold text-slate-500">Loading comprehensive syllabus blueprint...</p>
+      </div>
+    }
+
+    <!-- Main Content when Syllabus is Selected -->
+    @if (selectedSyllabus() && !loading()) {
+      <div class="space-y-8">
+
+        <!-- Active Examination Overview Card -->
+        <div class="rounded-3xl bg-white border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-slate-100">
+            <div class="space-y-2">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                  {{ selectedSyllabus()?.category }}
+                </span>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+                  {{ selectedSyllabus()?.conductingBody || 'National Authority' }}
+                </span>
+                @if (selectedSyllabus()?.subCategory) {
+                  <span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                    {{ selectedSyllabus()?.subCategory }}
+                  </span>
+                }
+              </div>
+
+              <h2 class="text-2xl sm:text-3xl font-black text-[#172F61]">
+                {{ selectedSyllabus()?.examName }}
+              </h2>
+
+              <p class="text-sm text-slate-600 max-w-3xl leading-relaxed">
+                {{ selectedSyllabus()?.overview }}
+              </p>
+            </div>
+
+            <!-- Action Buttons: Study Planner & Workspace -->
+            <div class="flex flex-wrap lg:flex-col gap-2.5 shrink-0 justify-start lg:justify-end">
+              <a
+                routerLink="/preparation"
+                [queryParams]="{ examId: selectedExamId() }"
+                class="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 transition text-center"
+              >
+                🚀 Open Prep Workspace
+              </a>
+
+              <a
+                routerLink="/study-planner"
+                [queryParams]="{ examId: selectedExamId() }"
+                class="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 text-slate-800 transition text-center border border-slate-200"
+              >
+                📅 Study Timetable
+              </a>
+            </div>
+          </div>
+
+          <!-- Exam Metrics Strip -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+              <span class="text-[11px] font-bold uppercase text-slate-500 block">Exam Pattern</span>
+              <strong class="text-xs sm:text-sm font-bold text-slate-800 mt-0.5 block truncate" [title]="selectedSyllabus()?.pattern">
+                {{ selectedSyllabus()?.pattern || 'Computer Based Test' }}
+              </strong>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+              <span class="text-[11px] font-bold uppercase text-slate-500 block">Total Marks</span>
+              <strong class="text-sm sm:text-base font-black text-slate-800 mt-0.5 block">
+                {{ selectedSyllabus()?.totalMarks || 100 }} Marks
+              </strong>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+              <span class="text-[11px] font-bold uppercase text-slate-500 block">Test Duration</span>
+              <strong class="text-sm sm:text-base font-black text-slate-800 mt-0.5 block">
+                {{ selectedSyllabus()?.durationMinutes || 180 }} Mins
+              </strong>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+              <span class="text-[11px] font-bold uppercase text-slate-500 block">Total Modules</span>
+              <strong class="text-sm sm:text-base font-black text-slate-800 mt-0.5 block">
+                {{ selectedSyllabus()?.subjects?.length || 0 }} Subjects
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Curriculum Mastery & Completion Progress Banner -->
+        <div class="rounded-3xl bg-white border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Curriculum Mastery Index</span>
+              <h3 class="text-xl font-bold text-[#172F61] mt-0.5">Syllabus Completion Tracker</h3>
+              <p class="text-xs text-slate-500 mt-0.5">Check off completed topics to update your mastery percentage.</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="flex items-baseline gap-2 bg-blue-50 px-5 py-2.5 rounded-2xl border border-blue-200">
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Overall</span>
+                <span class="text-3xl font-black text-blue-700">{{ currentProgress().completionPercentage }}%</span>
+              </div>
+
+              <!-- Quick Checklist Actions -->
+              <div class="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  (click)="markAllCompleted()"
+                  title="Mark all topics as finished"
+                  class="px-3 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl border border-emerald-200 transition"
+                >
+                  ✓ All Done
+                </button>
+                <button
+                  type="button"
+                  (click)="clearAllCompleted()"
+                  title="Reset checklist for this exam"
+                  class="px-3 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition"
+                >
+                  ↺ Reset
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Master Progress Bar -->
+          <div>
+            <div class="h-3.5 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/60">
+              <div
+                class="h-full bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 rounded-full transition-all duration-500 shadow-sm"
+                [style.width.%]="currentProgress().completionPercentage"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 block">Completed</span>
+              <strong class="text-2xl font-black text-emerald-900 mt-0.5 block">{{ currentProgress().completedTopics }}</strong>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200">
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-800 block">Remaining</span>
+              <strong class="text-2xl font-black text-amber-900 mt-0.5 block">{{ currentProgress().pendingTopics }}</strong>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-600 block">Total Topics</span>
+              <strong class="text-2xl font-black text-slate-900 mt-0.5 block">{{ currentProgress().totalTopics }}</strong>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-blue-50/60 border border-blue-200">
+              <span class="text-xs font-bold uppercase tracking-wider text-blue-800 block">Est. Prep Hours</span>
+              <strong class="text-2xl font-black text-blue-900 mt-0.5 block">{{ totalCurriculumHours() }} hrs</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subjects & Detailed Topics Breakdown Section -->
+        <div class="space-y-4">
+          
+          <!-- Filter & Search Toolbar Inside Syllabus -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
+            <div>
+              <h3 class="text-lg font-bold text-[#172F61]">Subject Modules & Chapters</h3>
+              <p class="text-xs text-slate-500">Filter topics by name, concept formulas, importance, or difficulty.</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+              <!-- Topic Text Search -->
+              <div class="relative w-full sm:w-64">
+                <input
+                  type="text"
+                  [ngModel]="topicSearchText()"
+                  (ngModelChange)="topicSearchText.set($event)"
+                  placeholder="Filter chapters or formulas..."
+                  class="w-full pl-8 pr-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+
+              <!-- Importance Filter -->
+              <select
+                [ngModel]="importanceFilter()"
+                (ngModelChange)="importanceFilter.set($event)"
+                class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white text-slate-700 focus:outline-none"
+              >
+                <option value="All">All Importance</option>
+                <option value="High">High Weightage Only</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+
+              <!-- Expand/Collapse Buttons -->
+              <div class="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  (click)="expandAll()"
+                  class="px-3 py-2 text-xs font-bold rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition"
+                >
+                  Expand All
+                </button>
+                <button
+                  type="button"
+                  (click)="collapseAll()"
+                  class="px-3 py-2 text-xs font-bold rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition"
+                >
+                  Collapse
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subject Cards Accordion -->
+          <div class="space-y-4">
+            @for (subject of filteredSubjects(); track subject._id) {
+              <div class="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden transition-all hover:border-blue-300">
+
+                <!-- Subject Header Accordion -->
+                <button
+                  type="button"
+                  (click)="toggleSubject(subject._id)"
+                  class="w-full text-left p-5 flex items-center justify-between gap-4 bg-white hover:bg-slate-50/60 transition cursor-pointer"
+                >
+                  <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-[#172F61] text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
+                      {{ subject.name.charAt(0) }}
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <h4 class="text-base sm:text-lg font-bold text-[#172F61]">{{ subject.name }}</h4>
+                        @if (subject.weightage) {
+                          <span class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                            {{ subject.weightage }} Weightage
+                          </span>
+                        }
+                      </div>
+                      <p class="text-xs text-slate-500 mt-0.5">
+                        {{ subject.topics.length }} Topics &bull; {{ subject.totalHours || 40 }} Hours &bull; {{ getSubjectProgress(subject.name) }}% completed
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-4">
+                    <div class="hidden sm:block w-32 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        class="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                        [style.width.%]="getSubjectProgress(subject.name)"
+                      ></div>
+                    </div>
+
+                    <span class="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 text-sm font-black transition">
+                      {{ isExpanded(subject._id) ? '−' : '+' }}
+                    </span>
+                  </div>
+                </button>
+
+                <!-- Subject Progress Bar on Mobile -->
+                <div class="sm:hidden h-1.5 bg-slate-100">
+                  <div
+                    class="h-full bg-emerald-500 transition-all duration-300"
+                    [style.width.%]="getSubjectProgress(subject.name)"
+                  ></div>
+                </div>
+
+                <!-- Topic Rows List -->
+                @if (isExpanded(subject._id)) {
+                  <div class="border-t border-slate-100 divide-y divide-slate-100 bg-slate-50/30">
+                    @for (topic of subject.topics; track topic._id) {
+                      <div class="p-4 sm:p-5 flex flex-col md:flex-row md:items-start justify-between gap-4 hover:bg-white transition-colors">
+                        
+                        <!-- Checkbox and Deep Details -->
+                        <div class="flex items-start gap-3.5 flex-1 min-w-0">
+                          <input
+                            type="checkbox"
+                            [checked]="isCompleted(topic._id)"
+                            [disabled]="savingTopicIds().includes(topic._id)"
+                            (change)="toggleTopic(topic._id, $any($event.target).checked)"
+                            class="w-5 h-5 mt-0.5 rounded-lg text-blue-600 border-slate-300 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer shrink-0"
+                          />
+                          
+                          <div class="space-y-1.5 min-w-0">
+                            <h5
+                              [class]="
+                                isCompleted(topic._id)
+                                  ? 'text-sm font-semibold text-slate-400 line-through'
+                                  : 'text-sm font-bold text-[#172F61]'
+                              "
+                            >
+                              {{ topic.title }}
+                            </h5>
+
+                            <!-- Rich Topic Description / Concept Summary -->
+                            @if (topic.description) {
+                              <p class="text-xs text-slate-600 leading-relaxed bg-white/70 p-2.5 rounded-xl border border-slate-150">
+                                {{ topic.description }}
+                              </p>
+                            }
+                          </div>
+                        </div>
+
+                        <!-- Topic Badges, Weightage & AI Action -->
+                        <div class="flex items-center gap-2 pl-8 md:pl-0 shrink-0 flex-wrap">
+                          
+                          <!-- Importance Badge -->
+                          <span
+                            [class]="
+                              topic.importance === 'High'
+                                ? 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200'
+                                : topic.importance === 'Medium'
+                                  ? 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200'
+                                  : 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            "
+                          >
+                            {{ topic.importance }}
+                          </span>
+
+                          <!-- Difficulty Badge -->
+                          @if (topic.difficulty) {
+                            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
+                              {{ topic.difficulty }}
+                            </span>
+                          }
+
+                          <!-- Weightage -->
+                          @if (topic.weightage) {
+                            <span class="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                              {{ topic.weightage }}
+                            </span>
+                          }
+
+                          <!-- Estimated Hours -->
+                          <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                            {{ topic.estimatedHours }}h
+                          </span>
+
+                          <!-- Ask AI Tutor Link (Pointing to /ai-mentor with pre-filled question) -->
+                          <a
+                            routerLink="/ai-mentor"
+                            [queryParams]="{ q: getAiMentorQuery(topic.title) }"
+                            class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200"
+                            title="Ask AI tutor for concept derivation, formula tricks, and past questions"
+                          >
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            <span>Ask AI</span>
+                          </a>
+                        </div>
+
+                      </div>
+                    } @empty {
+                      <div class="p-6 text-center text-xs text-slate-400">
+                        No topics match the current filter criteria for this subject.
+                      </div>
+                    }
+                  </div>
+                }
+
+              </div>
+            } @empty {
+              <div class="rounded-2xl bg-white border border-slate-200 p-12 text-center text-slate-500 space-y-3">
+                <div class="text-3xl">🔍</div>
+                <div class="text-base font-bold text-slate-700">No subjects or topics match your search query.</div>
+                <p class="text-xs">Try searching for broader terms or reset the filters above.</p>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+    }
+
+  </div>
+</div>

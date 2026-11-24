@@ -1,0 +1,795 @@
+<div class="min-h-screen bg-slate-50 text-slate-800 font-sans">
+
+  <!-- Hero & Advanced Search Section -->
+  <section class="bg-gradient-to-b from-[#172F61] via-[#0F1E42] to-slate-900 text-white py-16 px-6 text-center relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    
+    <div class="max-w-4xl mx-auto space-y-4 relative z-10">
+      <span class="inline-block px-4 py-1.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold uppercase tracking-wider border border-indigo-400/30">
+        Universal Examination Discovery Hub
+      </span>
+      <h1 class="text-3xl md:text-5xl font-black tracking-tight">
+        Discover Your Next Opportunity.
+      </h1>
+      <p class="text-slate-300 text-sm md:text-base max-w-2xl mx-auto">
+        Explore 120+ verified competitive, academic, entrance, and professional examinations from one unified platform.
+      </p>
+
+      <!-- Advanced Search Bar Form -->
+      <form [formGroup]="searchForm" class="mt-8 bg-white p-3 rounded-2xl shadow-2xl max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-3 text-slate-800 text-left">
+        
+        <!-- Search Keyword Input -->
+        <div class="md:col-span-4 relative">
+          <input type="text" formControlName="searchTerm" placeholder="Search GATE, UPSC, JEE, NEET, Banking..." 
+                 class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none text-xs font-medium">
+        </div>
+
+        <!-- Region Filter -->
+        <div class="md:col-span-2">
+          <select formControlName="region" class="w-full px-3 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none text-xs font-medium">
+            <option value="All">All Levels</option>
+            <option value="National">National</option>
+            <option value="State">State</option>
+            <option value="International">International</option>
+          </select>
+        </div>
+
+        <!-- Qualification Filter -->
+        <div class="md:col-span-3">
+          <select formControlName="qualification" class="w-full px-3 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none text-xs font-medium">
+            <option value="All">Any Qualification</option>
+            <option value="Graduate">Graduate / Degree</option>
+            <option value="12">Class 12 / 10+2</option>
+            <option value="Postgraduate">Master's / PG</option>
+          </select>
+        </div>
+
+        <!-- Exam Mode Filter -->
+        <div class="md:col-span-3">
+          <select formControlName="mode" class="w-full px-3 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none text-xs font-medium">
+            <option value="All">Any Exam Mode</option>
+            <option value="Online">Online CBT</option>
+            <option value="Offline">Offline Pen-Paper</option>
+          </select>
+        </div>
+
+      </form>
+
+      <!-- Quick Action Utilities -->
+      <div class="pt-4 flex flex-wrap justify-center items-center gap-3">
+        <button
+          type="button"
+          (click)="openAiFinder()"
+          class="px-4 py-2 rounded-xl bg-violet-600/30 hover:bg-violet-600/40 text-violet-200 border border-violet-400/30 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer backdrop-blur-sm"
+        >
+          <span>✨</span>
+          <span>AI Exam Finder Wizard</span>
+        </button>
+
+        <button
+          type="button"
+          (click)="openComparisonModal()"
+          class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer backdrop-blur-sm"
+        >
+          <span>⚖️</span>
+          <span>Compare Selected ({{ comparisonList.length }}/3)</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Categories Scrollable Bar & Saved Filter -->
+  <section class="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center gap-2">
+    <!-- Saved Exams Filter Button -->
+    <button
+      type="button"
+      (click)="toggleSavedFilter()"
+      class="px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition shadow-xs border cursor-pointer flex items-center gap-2 shrink-0"
+      [ngClass]="showOnlySaved ? 'bg-amber-500 text-white border-amber-500 shadow-amber-500/30' : 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100'"
+      title="View only your saved examinations and track daily jobs"
+    >
+      <span>★ My Saved Exams</span>
+      <span class="text-[10px] px-2 py-0.5 rounded-full font-black"
+            [ngClass]="showOnlySaved ? 'bg-white/20 text-white' : 'bg-amber-200 text-amber-900'">
+        {{ savedExamService.savedCount() }}
+      </span>
+    </button>
+
+    <div class="h-6 w-px bg-slate-200 mx-1 hidden sm:block"></div>
+
+    <!-- Category Stream Pills -->
+    <div class="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none flex-1">
+      <button *ngFor="let cat of categories" 
+              (click)="filterByCategory(cat.name)"
+              class="px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition shadow-2xs border cursor-pointer flex items-center gap-1.5 shrink-0"
+              [ngClass]="!showOnlySaved && selectedCategory === cat.name ? 'bg-indigo-600 text-white border-indigo-600 shadow-indigo-600/30' : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-300'">
+        <span>{{ cat.name }}</span>
+        <span class="text-[10px] px-1.5 py-0.5 rounded font-extrabold"
+              [ngClass]="!showOnlySaved && selectedCategory === cat.name ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'">
+          {{ cat.count }}
+        </span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Filter Chips (Status) & Results Count -->
+  <section class="max-w-7xl mx-auto px-6 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div class="flex items-center space-x-2 overflow-x-auto">
+      <span class="text-xs font-bold text-slate-500 mr-1 uppercase tracking-wider">Status:</span>
+      <button *ngFor="let status of ['All', 'Upcoming', 'Open', 'Verified']"
+              (click)="filterByStatus(status)"
+              class="px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer"
+              [ngClass]="selectedStatus === status ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'">
+        {{ status }}
+      </button>
+    </div>
+
+    <div class="flex items-center gap-3 text-xs font-bold text-slate-500">
+      <span *ngIf="isLoading" class="flex items-center gap-1.5 text-indigo-600">
+        <span class="w-3 h-3 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></span>
+        Syncing live exams...
+      </span>
+      <span>
+        Showing <span class="text-indigo-600 font-extrabold">{{ filteredExams.length }}</span> of {{ exams.length }} verified examinations
+      </span>
+      <button *ngIf="selectedCategory !== 'All Categories' || selectedStatus !== 'All' || searchForm.dirty"
+              (click)="resetFilters()"
+              class="text-xs text-rose-600 hover:text-rose-800 font-bold underline cursor-pointer ml-2">
+        Reset Filters
+      </button>
+    </div>
+  </section>
+
+  <!-- Main Examination Cards Grid -->
+  <section class="max-w-7xl mx-auto px-6 pb-24">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      <!-- Empty State -->
+      <div *ngIf="filteredExams.length === 0" class="col-span-full text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300 p-8 space-y-4">
+        <div class="text-4xl">🔍</div>
+        <h3 class="text-lg font-bold text-slate-800">No examinations matched your filters</h3>
+        <p class="text-xs text-slate-500 max-w-md mx-auto">Try broadening your search term, selecting "All Categories", or removing qualification restrictions.</p>
+        <button (click)="resetFilters()" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 transition cursor-pointer shadow-md">
+          Reset All Filters
+        </button>
+      </div>
+
+      <!-- Exam Cards -->
+      <div *ngFor="let exam of filteredExams" 
+           (click)="openExamDetail(exam)"
+           class="bg-white rounded-3xl p-6 shadow-lg shadow-slate-200/50 border border-slate-100 hover:-translate-y-1.5 hover:shadow-xl transition duration-300 flex flex-col justify-between cursor-pointer group">
+        
+        <div>
+          <!-- Top Tag, Save Button & Compare Button -->
+          <div class="flex justify-between items-start mb-3 gap-1.5">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold tracking-wide uppercase truncate"
+              [ngClass]="{
+                'bg-amber-100 text-amber-800': exam.status === 'Upcoming',
+                'bg-emerald-100 text-emerald-800': exam.status === 'Open',
+                'bg-indigo-100 text-indigo-800': exam.status === 'Verified'
+              }">
+              {{ exam.status }} · {{ exam.category }}
+            </span>
+
+            <div class="flex items-center gap-1 shrink-0">
+              <!-- Save / Bookmark Button -->
+              <button
+                type="button"
+                (click)="toggleSaveExam(exam, $event)"
+                class="px-2 py-1 rounded-lg text-[11px] font-bold border transition cursor-pointer flex items-center gap-1 shadow-2xs"
+                [ngClass]="isSaved(exam) ? 'bg-amber-500 text-white border-amber-500 shadow-amber-500/30 font-black' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-amber-300 hover:text-amber-700 hover:bg-amber-50/50'"
+                [title]="isSaved(exam) ? 'Exam Saved. Click to remove.' : 'Save exam to activate daily tasks and reminder notifications'"
+              >
+                <span>{{ isSaved(exam) ? '★ Saved' : '☆ Save' }}</span>
+              </button>
+
+              <!-- Compare Button -->
+              <button (click)="toggleComparison(exam, $event)" 
+                      class="px-2 py-1 rounded-lg text-[11px] font-bold border transition cursor-pointer"
+                      [ngClass]="isCompared(exam) ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-indigo-50'">
+                {{ isCompared(exam) ? '✓ Comp' : '+ Comp' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Exam Title -->
+          <h3 class="text-lg font-extrabold text-slate-900 group-hover:text-indigo-600 transition mb-1 leading-snug">
+            {{ exam.name }}
+          </h3>
+          <p class="text-xs font-bold text-indigo-600 mb-3">{{ exam.shortName }} · {{ exam.level }} Level</p>
+
+          <p class="text-xs text-slate-600 leading-relaxed mb-4 line-clamp-2">
+            {{ exam.description }}
+          </p>
+
+          <!-- Attributes Table Mini -->
+          <div class="space-y-1.5 text-xs text-slate-600 bg-slate-50 p-3.5 rounded-2xl mb-4 border border-slate-100">
+            <div class="flex justify-between">
+              <span class="text-slate-400 font-medium">Authority:</span>
+              <span class="font-bold text-slate-800 text-right truncate max-w-[170px]">{{ exam.conductingAuthority }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400 font-medium">Exam Date:</span>
+              <span class="font-bold text-indigo-600">{{ exam.examDateText }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400 font-medium">Mode:</span>
+              <span class="font-bold text-slate-800 truncate max-w-[170px]">{{ exam.examMode }}</span>
+            </div>
+          </div>
+
+          <!-- Saved Exam Daily Tasks Mini Widget -->
+          <div *ngIf="isSaved(exam)" class="mb-4 p-3 rounded-2xl bg-gradient-to-r from-amber-50/80 via-orange-50/50 to-indigo-50/30 border border-amber-200/90 shadow-2xs">
+            <div class="flex items-center justify-between mb-1.5">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                <span class="text-[11px] font-black text-amber-950">Today's Daily Jobs</span>
+              </div>
+              <span class="text-[10px] font-black text-amber-800">
+                {{ getProgress(exam).completed }}/{{ getProgress(exam).total }} Done ({{ getProgress(exam).percentage }}%)
+              </span>
+            </div>
+
+            <!-- Mini Progress Bar -->
+            <div class="w-full h-1.5 bg-amber-200/70 rounded-full overflow-hidden mb-2">
+              <div
+                class="h-full bg-gradient-to-r from-amber-500 to-emerald-500 transition-all duration-300"
+                [style.width.%]="getProgress(exam).percentage"
+              ></div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-slate-600 font-semibold truncate max-w-[150px]">
+                {{ getProgress(exam).total - getProgress(exam).completed }} remaining today
+              </span>
+              <button
+                type="button"
+                (click)="openDailyTasksModal(exam, $event)"
+                class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-[10px] shadow-2xs transition cursor-pointer"
+              >
+                View Jobs 📋
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Footer Actions -->
+        <div class="pt-3.5 border-t border-slate-100 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-1.5">
+            <button
+              type="button"
+              (click)="startPreparation(exam, $event)"
+              class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-[11px] shadow-sm hover:shadow transition cursor-pointer flex items-center gap-1"
+            >
+              <span>⚡</span>
+              <span>Start Prep</span>
+            </button>
+            <button
+              type="button"
+              (click)="exploreSyllabus(exam, $event)"
+              class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 font-bold text-[11px] transition cursor-pointer"
+            >
+              <span>📖 Syllabus</span>
+            </button>
+          </div>
+          <span class="text-[11px] font-bold text-indigo-600 group-hover:underline">Details →</span>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== EXAMINATION DETAIL MODAL ==================== -->
+  <div *ngIf="selectedExamForDetail" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-fadeIn">
+      
+      <!-- Modal Header -->
+      <div class="p-6 md:p-8 bg-gradient-to-r from-indigo-950 to-[#172F61] text-white flex justify-between items-start">
+        <div>
+          <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+            {{ selectedExamForDetail.category }} · {{ selectedExamForDetail.level }} Level
+          </span>
+          <h2 class="text-xl md:text-2xl font-black mt-2">{{ selectedExamForDetail.name }}</h2>
+          <p class="text-xs md:text-sm text-slate-300 mt-1 font-semibold">{{ selectedExamForDetail.shortName }} · {{ selectedExamForDetail.conductingAuthority }}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <!-- Save Exam Toggle in Modal -->
+          <button
+            type="button"
+            (click)="toggleSaveExam(selectedExamForDetail, $event)"
+            class="px-3.5 py-2 rounded-xl font-black text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer"
+            [ngClass]="isSaved(selectedExamForDetail) ? 'bg-amber-400 text-slate-900 hover:bg-amber-300' : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'"
+          >
+            <span>{{ isSaved(selectedExamForDetail) ? '★ Saved' : '☆ Save Exam' }}</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="startPreparation(selectedExamForDetail)"
+            class="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-black text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>⚡</span>
+            <span>Start Prep</span>
+          </button>
+          <button (click)="closeExamDetail()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-lg font-bold cursor-pointer">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Navigation Tabs -->
+      <div class="flex border-b border-slate-200 px-6 bg-slate-50 overflow-x-auto">
+        <button *ngFor="let tab of ['overview', 'daily tasks', 'syllabus', 'pattern', 'dates', 'eligibility']"
+                (click)="activeDetailTab = tab"
+                class="px-5 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition whitespace-nowrap cursor-pointer"
+                [ngClass]="activeDetailTab === tab ? 'border-indigo-600 text-indigo-600 bg-white' : 'border-transparent text-slate-500 hover:text-slate-800'">
+          {{ tab }}
+        </button>
+      </div>
+
+      <!-- Modal Tab Content Body -->
+      <div class="p-6 md:p-8 overflow-y-auto space-y-6 flex-1 text-sm text-slate-700">
+        
+        <!-- Daily Tasks Tab inside Exam Detail -->
+        <div *ngIf="activeDetailTab === 'daily tasks'" class="space-y-4">
+          <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-indigo-50 border border-amber-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
+                <h4 class="font-black text-slate-900 text-base">Today's Daily Tasks & Preparation Jobs</h4>
+              </div>
+              <p class="text-xs text-slate-600 mt-0.5">
+                Target daily goals to achieve 100% readiness. Remaining jobs are reminded via the Notification bar.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-extrabold text-indigo-700">
+                {{ getProgress(selectedExamForDetail).completed }}/{{ getProgress(selectedExamForDetail).total }} Done ({{ getProgress(selectedExamForDetail).percentage }}%)
+              </span>
+              <button
+                *ngIf="!isSaved(selectedExamForDetail)"
+                type="button"
+                (click)="toggleSaveExam(selectedExamForDetail, $event)"
+                class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs shadow-xs cursor-pointer"
+              >
+                Save for Reminders ★
+              </button>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+            <div
+              class="h-full bg-gradient-to-r from-amber-500 via-indigo-600 to-emerald-500 transition-all duration-300"
+              [style.width.%]="getProgress(selectedExamForDetail).percentage"
+            ></div>
+          </div>
+
+          <!-- Task Items -->
+          <div class="space-y-3 pt-2">
+            <div *ngFor="let task of getTodayTasks(selectedExamForDetail)"
+                 class="p-4 rounded-2xl border transition-all flex items-start gap-3.5"
+                 [ngClass]="task.isCompleted ? 'bg-emerald-50/60 border-emerald-200' : 'bg-slate-50 hover:bg-slate-100/70 border-slate-200'">
+              
+              <button
+                type="button"
+                (click)="toggleDailyTask(task.id, selectedExamForDetail, $event)"
+                class="mt-0.5 w-6 h-6 rounded-lg border flex items-center justify-center transition cursor-pointer shrink-0"
+                [ngClass]="task.isCompleted ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-slate-300 hover:border-indigo-500'"
+              >
+                <span *ngIf="task.isCompleted" class="text-xs font-black">✓</span>
+              </button>
+
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider"
+                        [ngClass]="{
+                          'bg-blue-100 text-blue-800': task.category === 'concept',
+                          'bg-purple-100 text-purple-800': task.category === 'pyq',
+                          'bg-amber-100 text-amber-800': task.category === 'mock',
+                          'bg-emerald-100 text-emerald-800': task.category === 'revision'
+                        }">
+                    {{ task.category }}
+                  </span>
+                  <span class="text-[11px] text-slate-500 font-medium">⏱️ ~{{ task.estimatedMinutes }} mins</span>
+                  <span *ngIf="task.isCompleted" class="text-[10px] font-bold text-emerald-700 ml-auto">Done ✓</span>
+                </div>
+                <div class="text-xs font-bold text-slate-900 leading-snug"
+                     [ngClass]="{ 'line-through text-slate-400': task.isCompleted }">
+                  {{ task.title }}
+                </div>
+              </div>
+
+              <!-- Quick Launch -->
+              <div class="shrink-0 flex items-center">
+                <button
+                  *ngIf="task.category === 'pyq'"
+                  (click)="jumpToPyqs(selectedExamForDetail, $event)"
+                  class="px-2.5 py-1 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 text-[11px] font-bold border border-purple-200 transition cursor-pointer"
+                >
+                  PYQs →
+                </button>
+                <button
+                  *ngIf="task.category === 'mock'"
+                  (click)="jumpToMocks(selectedExamForDetail, $event)"
+                  class="px-2.5 py-1 rounded-xl bg-amber-50 text-amber-700 hover:bg-amber-100 text-[11px] font-bold border border-amber-200 transition cursor-pointer"
+                >
+                  Mock Test →
+                </button>
+                <button
+                  *ngIf="task.category === 'concept' || task.category === 'revision'"
+                  (click)="exploreSyllabus(selectedExamForDetail, $event)"
+                  class="px-2.5 py-1 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 text-[11px] font-bold border border-blue-200 transition cursor-pointer"
+                >
+                  Syllabus →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Overview Tab -->
+        <div *ngIf="activeDetailTab === 'overview'" class="space-y-4">
+          <h4 class="font-bold text-slate-900 text-base">Examination Overview</h4>
+          <p class="leading-relaxed">{{ selectedExamForDetail.description }}</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <strong class="block text-slate-900 mb-1">Conducting Authority</strong>
+              <span class="text-slate-600">{{ selectedExamForDetail.conductingAuthority }}</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <strong class="block text-slate-900 mb-1">Examination Frequency</strong>
+              <span class="text-slate-600">{{ selectedExamForDetail.frequency }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Syllabus Tab -->
+        <div *ngIf="activeDetailTab === 'syllabus'" class="space-y-4">
+          <div class="flex justify-between items-center">
+            <div>
+              <h4 class="font-bold text-slate-900 text-base">Core Subject Breakdown</h4>
+              <p class="text-slate-500 text-xs">Verified syllabus subjects integrated with ExamSphere AI notes & mock tests.</p>
+            </div>
+            <button (click)="exploreSyllabus(selectedExamForDetail)" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition cursor-pointer shadow-sm">
+              Explore Full Syllabus Explorer →
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <div *ngFor="let sub of selectedExamForDetail.subjects" class="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100 flex items-center justify-between">
+              <span class="font-bold text-indigo-900">{{ sub }}</span>
+              <span (click)="exploreSyllabus(selectedExamForDetail)" class="text-xs text-indigo-600 font-semibold bg-white px-2.5 py-1 rounded-lg shadow-sm cursor-pointer hover:bg-indigo-600 hover:text-white transition">View Topics →</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exam Pattern Tab -->
+        <div *ngIf="activeDetailTab === 'pattern'" class="space-y-4">
+          <h4 class="font-bold text-slate-900 text-base">Exam Pattern & Mode</h4>
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <p><strong>Mode of Exam:</strong> {{ selectedExamForDetail.examMode }}</p>
+            <p><strong>Frequency:</strong> {{ selectedExamForDetail.frequency }}</p>
+            <p><strong>Assessment Format:</strong> Objective CBT / Pen-Paper with sectional timing & negative marking rules per official board criteria.</p>
+          </div>
+        </div>
+
+        <!-- Important Dates Tab -->
+        <div *ngIf="activeDetailTab === 'dates'" class="space-y-4">
+          <h4 class="font-bold text-slate-900 text-base">Timeline & Schedule</h4>
+          <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-medium">
+            ⚠️ Official examination dates are released by {{ selectedExamForDetail.conductingAuthority }}. Check official portal for exact shifts.
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex justify-between items-center">
+            <span class="font-medium text-slate-600">Expected Exam Cycle</span>
+            <span class="font-bold text-indigo-600">{{ selectedExamForDetail.examDateText }}</span>
+          </div>
+        </div>
+
+        <!-- Eligibility Tab -->
+        <div *ngIf="activeDetailTab === 'eligibility'" class="space-y-4">
+          <h4 class="font-bold text-slate-900 text-base">Eligibility Criteria</h4>
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+            <p><strong>Educational Qualification:</strong> {{ selectedExamForDetail.qualification }}</p>
+            <p class="mt-2 text-xs text-slate-500">Check official notification for specific category relaxations and aggregate percentages.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-6 bg-slate-50 border-t border-slate-200 flex justify-end space-x-3">
+        <button (click)="closeExamDetail()" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs transition cursor-pointer">
+          Close
+        </button>
+        <button
+          type="button"
+          (click)="startPreparation(selectedExamForDetail)"
+          class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white font-black text-xs shadow-lg shadow-indigo-600/30 transition cursor-pointer flex items-center gap-2"
+        >
+          <span>⚡</span>
+          <span>Start AI Preparation Workspace →</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== EXAM COMPARISON MODAL ==================== -->
+  <div *ngIf="isComparisonOpen" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-5xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-fadeIn">
+      
+      <div class="p-6 md:p-8 bg-slate-900 text-white flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-black">Examination Side-by-Side Comparison</h2>
+          <p class="text-xs text-slate-400 mt-1">Comparing {{ comparisonList.length }} examinations</p>
+        </div>
+        <button (click)="closeComparisonModal()" class="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center font-bold cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-6 overflow-x-auto flex-1">
+        <table class="w-full text-left text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-slate-200">
+              <th class="p-4 font-bold text-slate-400">Parameter</th>
+              <th *ngFor="let exam of comparisonList" class="p-4 font-black text-indigo-600 text-base">{{ exam.shortName }}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr>
+              <td class="p-4 font-bold text-slate-700">Full Name</td>
+              <td *ngFor="let exam of comparisonList" class="p-4 text-slate-600 text-xs">{{ exam.name }}</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-slate-700">Category</td>
+              <td *ngFor="let exam of comparisonList" class="p-4 text-slate-600 text-xs font-semibold">{{ exam.category }}</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-slate-700">Conducting Authority</td>
+              <td *ngFor="let exam of comparisonList" class="p-4 text-slate-600 text-xs">{{ exam.conductingAuthority }}</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-slate-700">Exam Mode</td>
+              <td *ngFor="let exam of comparisonList" class="p-4 text-slate-600 text-xs">{{ exam.examMode }}</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-slate-700">Qualification</td>
+              <td *ngFor="let exam of comparisonList" class="p-4 text-slate-600 text-xs">{{ exam.qualification }}</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-slate-700">Subjects</td>
+              <td *ngFor="let exam of comparisonList" class="p-4 text-slate-600 text-xs">
+                <ul class="list-disc list-inside space-y-0.5">
+                  <li *ngFor="let sub of exam.subjects.slice(0, 4)">{{ sub }}</li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="p-6 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+        <button (click)="comparisonList = []" class="text-xs font-bold text-rose-600 hover:underline cursor-pointer">Clear Comparison</button>
+        <button (click)="closeComparisonModal()" class="px-6 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs cursor-pointer">Close</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== AI EXAM FINDER WIZARD MODAL ==================== -->
+  <div *ngIf="isAiFinderOpen" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden p-8 animate-fadeIn space-y-6">
+      
+      <div class="flex justify-between items-center">
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-violet-100 text-violet-800">✨ AI Exam Finder Assistant</span>
+        <button (click)="closeAiFinder()" class="text-slate-400 hover:text-slate-700 font-bold cursor-pointer">✕</button>
+      </div>
+
+      <!-- Step 1: Input -->
+      <div *ngIf="aiFinderStep === 1" class="space-y-4">
+        <h3 class="text-2xl font-extrabold text-slate-900">Let AI find your ideal exams.</h3>
+        <p class="text-xs text-slate-500">Select your current academic background and interest domain:</p>
+        
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Highest Qualification</label>
+          <select [(ngModel)]="aiQualification" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium">
+            <option value="Graduate">Graduate / B.Tech / B.Sc</option>
+            <option value="12">Class 12 / Higher Secondary</option>
+            <option value="Postgraduate">Postgraduate / Master's</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Interest Domain</label>
+          <input type="text" [(ngModel)]="aiInterest" placeholder="e.g. Engineering, Civil Services, Banking" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium">
+        </div>
+
+        <button (click)="runAiRecommendation()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 cursor-pointer">
+          Generate AI Recommendations →
+        </button>
+      </div>
+
+      <!-- Step 2: Loading State -->
+      <div *ngIf="aiFinderStep === 2" class="text-center py-12 space-y-4">
+        <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <h4 class="font-bold text-slate-900">Analyzing 120+ Examinations...</h4>
+        <p class="text-xs text-slate-500">Matching your profile with syllabus requirements and career outcomes.</p>
+      </div>
+
+      <!-- Step 3: Results -->
+      <div *ngIf="aiFinderStep === 3" class="space-y-4">
+        <h3 class="text-xl font-extrabold text-slate-900">Recommended For You</h3>
+        <div class="space-y-3 max-h-72 overflow-y-auto">
+          <div *ngFor="let rec of aiRecommendations" class="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 flex justify-between items-center">
+            <div>
+              <h5 class="font-extrabold text-indigo-950 text-sm">{{ rec.name }}</h5>
+              <p class="text-xs text-slate-600">{{ rec.shortName }} · {{ rec.category }}</p>
+            </div>
+            <button (click)="closeAiFinder(); openExamDetail(rec);" class="px-3.5 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-xl cursor-pointer">View Details</button>
+          </div>
+        </div>
+        <button (click)="aiFinderStep = 1" class="w-full py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">Search Again</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== DAILY PREPARATION TASKS MODAL ==================== -->
+  <div *ngIf="activeDailyTaskExam" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-fadeIn border border-slate-100">
+      
+      <!-- Modal Header -->
+      <div class="p-6 bg-gradient-to-r from-[#172F61] via-[#1a3875] to-indigo-900 text-white flex justify-between items-start">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400 text-slate-900">
+              ★ Saved Exam Daily Plan
+            </span>
+            <span class="text-xs text-indigo-200 font-semibold">
+              {{ activeDailyTaskExam.category }}
+            </span>
+          </div>
+          <h2 class="text-xl md:text-2xl font-black">{{ activeDailyTaskExam.name }}</h2>
+          <p class="text-xs text-slate-300 mt-1 font-medium">
+            Daily Preparation Jobs & Checklist · Keep your streak active!
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="toggleSaveExam(activeDailyTaskExam)"
+            class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+            [ngClass]="isSaved(activeDailyTaskExam) ? 'bg-amber-400 text-slate-900' : 'bg-white/20 text-white'"
+          >
+            {{ isSaved(activeDailyTaskExam) ? '★ Saved' : '☆ Save' }}
+          </button>
+          <button
+            type="button"
+            (click)="closeDailyTasksModal()"
+            class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-lg font-bold cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Progress Banner -->
+      <div class="p-5 bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-slate-50 border-b border-slate-100">
+        <div class="flex justify-between items-center mb-2">
+          <div>
+            <span class="text-xs font-bold text-slate-900">Today's Progress</span>
+            <span class="text-[11px] text-slate-500 ml-2">
+              ({{ getProgress(activeDailyTaskExam).completed }} of {{ getProgress(activeDailyTaskExam).total }} jobs completed)
+            </span>
+          </div>
+          <span class="text-sm font-black text-indigo-600">
+            {{ getProgress(activeDailyTaskExam).percentage }}% Completed
+          </span>
+        </div>
+
+        <!-- Animated Progress Bar -->
+        <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+          <div
+            class="h-full bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 transition-all duration-300 rounded-full"
+            [style.width.%]="getProgress(activeDailyTaskExam).percentage"
+          ></div>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between text-[11px] text-slate-600">
+          <span class="flex items-center gap-1 text-emerald-700 font-bold" *ngIf="getProgress(activeDailyTaskExam).percentage === 100">
+            🎉 All daily jobs completed for today! Keep up the momentum!
+          </span>
+          <span class="text-amber-800 font-semibold" *ngIf="getProgress(activeDailyTaskExam).percentage < 100">
+            ⏳ {{ getProgress(activeDailyTaskExam).total - getProgress(activeDailyTaskExam).completed }} task(s) remaining for today.
+          </span>
+          <span class="text-slate-400 font-mono text-[10px]">Exam Date: {{ activeDailyTaskExam.examDateText }}</span>
+        </div>
+      </div>
+
+      <!-- Tasks List Body -->
+      <div class="p-6 overflow-y-auto space-y-3 flex-1 bg-white">
+        <div *ngFor="let task of getTodayTasks(activeDailyTaskExam)" 
+             class="p-4 rounded-2xl border transition-all flex items-start gap-3.5"
+             [ngClass]="task.isCompleted ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50 hover:bg-slate-100/70 border-slate-200'">
+          
+          <!-- Checkbox / Toggle -->
+          <button
+            type="button"
+            (click)="toggleDailyTask(task.id, activeDailyTaskExam)"
+            class="mt-0.5 w-6 h-6 rounded-lg border flex items-center justify-center transition cursor-pointer shrink-0"
+            [ngClass]="task.isCompleted ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs' : 'bg-white border-slate-300 hover:border-indigo-500'"
+          >
+            <span *ngIf="task.isCompleted" class="text-xs font-black">✓</span>
+          </button>
+
+          <!-- Task Content -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider"
+                    [ngClass]="{
+                      'bg-blue-100 text-blue-800': task.category === 'concept',
+                      'bg-purple-100 text-purple-800': task.category === 'pyq',
+                      'bg-amber-100 text-amber-800': task.category === 'mock',
+                      'bg-emerald-100 text-emerald-800': task.category === 'revision'
+                    }">
+                {{ task.category }}
+              </span>
+              <span class="text-[11px] text-slate-500 font-medium">⏱️ ~{{ task.estimatedMinutes }} mins</span>
+              <span *ngIf="task.isCompleted" class="text-[10px] font-bold text-emerald-700 ml-auto">Done ✓</span>
+            </div>
+
+            <div class="text-xs font-bold text-slate-900 leading-snug"
+                 [ngClass]="{ 'line-through text-slate-400': task.isCompleted }">
+              {{ task.title }}
+            </div>
+          </div>
+
+          <!-- Direct Action Link per task type -->
+          <div class="shrink-0 flex items-center">
+            <button
+              *ngIf="task.category === 'pyq'"
+              (click)="jumpToPyqs(activeDailyTaskExam)"
+              class="px-2.5 py-1 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 text-[11px] font-bold border border-purple-200 transition cursor-pointer"
+            >
+              Solve PYQ →
+            </button>
+            <button
+              *ngIf="task.category === 'mock'"
+              (click)="jumpToMocks(activeDailyTaskExam)"
+              class="px-2.5 py-1 rounded-xl bg-amber-50 text-amber-700 hover:bg-amber-100 text-[11px] font-bold border border-amber-200 transition cursor-pointer"
+            >
+              Mock Test →
+            </button>
+            <button
+              *ngIf="task.category === 'concept' || task.category === 'revision'"
+              (click)="exploreSyllabus(activeDailyTaskExam)"
+              class="px-2.5 py-1 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 text-[11px] font-bold border border-blue-200 transition cursor-pointer"
+            >
+              Syllabus →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-1.5 text-xs text-slate-500">
+          <span>🔔</span>
+          <span>Incomplete tasks stay active in your top Notification bell as reminders!</span>
+        </div>
+        <button
+          type="button"
+          (click)="closeDailyTasksModal()"
+          class="px-5 py-2 rounded-xl bg-[#172F61] hover:bg-[#112347] text-white text-xs font-bold shadow-sm transition cursor-pointer"
+        >
+          Done & Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
