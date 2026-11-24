@@ -1,0 +1,90 @@
+# =========================================================================
+# ExamSphere AI - Universal Workspace .gitignore
+# Covers Root, Backend (Node/Express/MongoDB), and Frontend (Angular 21)
+# =========================================================================
+
+# Dependencies
+**/node_modules/
+package-lock.json.backup
+
+# Environment variables & secrets (Crucial: never commit API keys or DB credentials)
+**/.env
+**/.env.*
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+!**/.env.example
+
+# Production & Build outputs
+dist/
+**/dist/
+build/
+**/build/
+out-tsc/
+**/out-tsc/
+bazel-out/
+**/bazel-out/
+*.tsbuildinfo
+
+# Angular Cache & Framework Artifacts
+**/.angular/
+**/.angular/cache/
+.sass-cache/
+**/coverage/
+*.lcov
+.nyc_output/
+
+# Logs & Debugging
+logs/
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+testem.log
+
+# Runtime & Process files
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary and Cache Directories
+tmp/
+**/tmp/
+temp/
+**/temp/
+.cache/
+**/scratch/
+
+# IDE and Editor Files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/mcp.json
+.idea/
+**/.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-workspace
+.project
+.classpath
+.settings/
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini

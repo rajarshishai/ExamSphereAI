@@ -1,0 +1,47 @@
+Created At: 2026-11-20T00:53:25+05:30
+Completed At: 2026-11-20T00:53:25+05:30
+Created At: 2026-11-20T00:53:25+05:30
+Completed At: 2026-11-20T00:53:25+05:30
+Showing lines 1-42 of 42
+1: import { Component, OnInit, inject } from '@angular/core';
+2: import { CommonModule } from '@angular/common';
+3: import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
+4: import { Router } from '@angular/router';
+5: import { AuthService } from '../../../core/services/auth.service/auth.service';
+6: 
+7: @Component({ selector: 'app-auth', standalone: true, imports: [CommonModule, ReactiveFormsModule], templateUrl: './auth.html', styleUrls: ['./auth.css'] })
+8: export class Auth implements OnInit {
+9:   private authService = inject(AuthService);
+10:   private router = inject(Router);
+11:   isLoginMode = true; loginForm!: FormGroup; registerForm!: FormGroup;
+12:   isSubmitting = false; successMessage = ''; errorMessage = ''; showLoginPassword = false; showRegisterPassword = false;
+13:   loginVisual = { imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6JaV6MD8UnscLDob1CsyqcLKqv-2rFIXw93DBwU2LLu-ySb-6EI_87K0&s=10', badge: 'AI-Powered Study Hub', title: 'Welcome Back, Aspirant.', subtitle: 'Pick up right where you left off with personalized AI mock tests, performance analytics, and curated PYQs.' };
+14:   registerVisual = { imageUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1000&q=80', badge: 'Start Your Journey', title: 'Master Every Examination.', subtitle: 'Join students preparing smarter with adaptive syllabus tracking and 24/7 AI tutoring.' };
+15:   examsList = ['GATE Computer Science','UPSC Civil Services','JEE Advanced','NEET UG','CAT Management','GRE / GMAT','Other / General Preparation'];
+16:   constructor(private fb: FormBuilder) {}
+17:   ngOnInit(): void { this.initForms(); }
+18:   initForms(): void {
+19:     this.loginForm = this.fb.group({ email: ['', [Validators.required, Validators.email]], password: ['', [Validators.required, Validators.minLength(6)]], rememberMe: [false] });
+20:     this.registerForm = this.fb.group({ fullName: ['', [Validators.required, Validators.minLength(2)]], email: ['', [Validators.required, Validators.email]], targetExam: ['', Validators.required], password: ['', [Validators.required, Validators.minLength(8), this.passwordStrengthValidator]], terms: [false, Validators.requiredTrue] });
+21:   }
+22:   switchMode(toLogin: boolean): void { if (this.isLoginMode === toLogin) return; this.isLoginMode = toLogin; this.errorMessage = ''; this.successMessage = ''; }
+23:   passwordStrengthValidator(control: AbstractControl): ValidationErrors | null { const value = control.value || ''; return /[A-Z]/.test(value) && /[0-9]/.test(value) ? null : { weakPassword: true }; }
+24:   onLoginSubmit(): void {
+25:     if (this.loginForm.invalid) { this.loginForm.markAllAsTouched(); return; }
+26:     this.isSubmitting = true; this.errorMessage = ''; this.successMessage = '';
+27:     const v = this.loginForm.getRawValue();
+28:     this.authService.login(v.email, v.password, !!v.rememberMe).subscribe({
+29:       next: () => { this.isSubmitting = false; this.successMessage = 'Signed in successfully. Redirecting...'; this.router.navigateByUrl('/dashboard'); },
+30:       error: err => { this.isSubmitting = false; this.errorMessage = err.error?.message || 'Login failed. Check your backend connection and credentials.'; }
+31:     });
+32:   }
+33:   onRegisterSubmit(): void {
+34:     if (this.registerForm.invalid) { this.registerForm.markAllAsTouched(); return; }
+35:     this.isSubmitting = true; this.errorMessage = ''; this.successMessage = '';
+36:     const v = this.registerForm.getRawValue();
+37:     this.authService.register(v.fullName, v.email, v.password).subscribe({
+38:       next: () => { this.isSubmitting = false; this.successMessage = 'Account created successfully. Redirecting...'; this.router.navigateByUrl('/dashboard'); },
+39:       error: err => { this.isSubmitting = false; this.errorMessage = err.error?.message || 'Registration failed. Please try again.'; }
+40:     });
+41:   }
+42: }
